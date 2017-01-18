@@ -35,7 +35,6 @@
     <I18nAssemblies>West</I18nAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>

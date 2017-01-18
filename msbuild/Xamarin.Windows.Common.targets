@@ -90,14 +90,27 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       _SetTargetFrameworkDirectory;
       $(GetReferenceAssemblyPathsDependsOn);
     </GetReferenceAssemblyPathsDependsOn>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <ResolveAssemblyReferencesDependsOn>
+      _FixupMSCorlibReference;
+      $(ResolveAssemblyReferencesDependsOn);
+    </ResolveAssemblyReferencesDependsOn>
     <CleanDependsOn>
       $(CleanDependsOn);
       _CleanXamarinWindowsOutputs;
     </CleanDependsOn>
   </PropertyGroup>
+
+  <!-- Microsoft.CSharp.Targets adds the .NET mscorlib.dll to _ExplicitReference.
+       Here we remove it and make sure @(Reference) contains mscorlib instead. -->
+  <Target Name="_FixupMSCorlibReference">
+    <PropertyGroup>
+      <AllReferences>@(Reference)</AllReferences>
+    </PropertyGroup>
+    <ItemGroup>
+      <_ExplicitReference Remove="$(FrameworkPathOverride)\mscorlib.dll" />
+      <Reference Include="mscorlib" Condition="!$(AllReferences.Contains('mscorlib'))"/>
+    </ItemGroup>
+  </Target>
 
   <Target Name="_SetTargetFrameworkDirectory">
     <PropertyGroup>

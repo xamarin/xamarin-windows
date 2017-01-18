@@ -1,6 +1,13 @@
 Xamarin Windows
 ===============
 
+Goals for this project:
+
+ * Provide MSBuild and VS tooling for building, launching, debugging Windows
+   x64 full AOT binaries.
+ * Provide reusable MSBuild tasks and targets for other platforms which also
+   compile down to full AOT binaries, e.g. Xbox One and PS4.
+
 # Build instructions
 
 You will need Cygwin, Visual Studio 2015 and a Mono for Windows release
@@ -53,4 +60,23 @@ and try running the tests.
 
 # Usage
 
-TBD
+For now one has to edit the `.csproj` file to make it a Xamarin.Windows
+project. The line
+
+```xml
+<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+```
+
+must be changed to 
+
+```xml
+<Import Project="$(PathToXamarinWindows)\Xamarin.Windows.CSharp.targets" />
+```
+
+To run a full AOT compile of a `.csproj` run:
+
+```
+MSBuild.exe /p:MonoDevRoot=C:\xw\external\mono /p:PathToXamarinWindows=C:\xw\msbuild /t:_CreateNativeWindowsExecutable /v:Detailed <csproj-file>
+```
+
+The `.exe` should now be in the project's `bin/Debug/Native/` folder.
