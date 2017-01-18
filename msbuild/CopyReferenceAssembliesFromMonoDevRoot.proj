@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <ReferenceAssembliesPath Condition="'$(ReferenceAssembliesPath)' == ''">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework</ReferenceAssembliesPath>  
+    <XamarinWindowsTargetPath>$(ReferenceAssembliesPath)\Xamarin.Windows\v1.0</XamarinWindowsTargetPath>  
+  </PropertyGroup>  
+
+  <Target Name="Build">
+    <Error Text="The MonoDevRoot property must be set on the command line." Condition="'$(MonoDevRoot)' == ''"/>
+    <RemoveDir Directories="$(XamarinWindowsTargetPath)" Condition="Exists('$(XamarinWindowsTargetPath)')"/>
+    <ItemGroup>
+      <Assemblies Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\*.dll"/>
+      <PDBs Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\*.pdb"/>
+      <FacadeAssemblies Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\Facades\*.dll"/>
+    </ItemGroup> 
+    <Copy SourceFiles="@(Assemblies)" 
+          DestinationFiles="@(Assemblies->'$(XamarinWindowsTargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(PDBs)" 
+          DestinationFiles="@(PDBs->'$(XamarinWindowsTargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(FacadeAssemblies)" 
+          DestinationFiles="@(FacadeAssemblies->'$(XamarinWindowsTargetPath)\Facades\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)\FrameworkList.xml" 
+          DestinationFolder="$(XamarinWindowsTargetPath)\RedistList"/>
+  </Target>
+
+</Project>
