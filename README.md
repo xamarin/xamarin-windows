@@ -8,10 +8,10 @@ installed in order to build this project. Consult the [Compiling Mono on
 Windows](http://www.mono-project.com/docs/compiling-mono/windows/)
 documentation for more details on the prerequisites.
 
-*NOTE*: Windows has a problem with long (> 260 characters) paths. To avoid any
-issues related to this limitation when building this project you should make
-sure to checkout this repository in a shallow path on your system. E.g. to
-`C:\xw`:
+**NOTE**: Windows has a problem with long (> 260 characters) paths. To avoid
+any issues related to this limitation when building this project you should
+make sure to checkout this repository in a shallow path on your system. E.g.
+to `C:\xw`:
 
 ```bash
 cd /cygdrive/c/
@@ -37,8 +37,8 @@ make
 
 ## Copy reference assemblies
 
-*NOTE: Visual Studio typically locks the files which will be copied here. You
-*may have to close VS before running command.
+**NOTE**: Visual Studio typically locks the files which will be copied here.
+You may have to close VS before running this command.
 
 Run the following in an Administrator `cmd.exe`:
 ```
@@ -46,9 +46,10 @@ cd C:\xw
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /p:MonoDevRoot=%cd%\external\mono msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
 ```
 
-## Build the msbuild tasks
+## Build the MSBuild tasks
 
-You should now be able to open the `Xamarin.Windows.sln` solution. Build it and try running the tests.
+You should now be able to open the `Xamarin.Windows.sln` solution. Build it
+and try running the tests.
 
 # Usage
 
