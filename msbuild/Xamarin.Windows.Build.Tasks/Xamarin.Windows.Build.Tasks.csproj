@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{36907F0D-086C-4144-A532-4E277EA0CEFF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xamarin.Windows.Tasks</RootNamespace>
+    <AssemblyName>Xamarin.Windows.Build.Tasks</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
+    <OutputPath>bin\Test\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Build.14.3.0\lib\net45\Microsoft.Build.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Engine, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Build.Engine.14.3.0\lib\net45\Microsoft.Build.Engine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Framework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Build.Framework.14.3.0\lib\net45\Microsoft.Build.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Utilities.Core, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Build.Utilities.Core.14.3.0\lib\net45\Microsoft.Build.Utilities.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\BaseStep.cs">
+      <Link>Linker\Mono.Linker.Steps\BaseStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\BlacklistStep.cs">
+      <Link>Linker\Mono.Linker.Steps\BlacklistStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\CleanStep.cs">
+      <Link>Linker\Mono.Linker.Steps\CleanStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\IStep.cs">
+      <Link>Linker\Mono.Linker.Steps\IStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\LoadI18nAssemblies.cs">
+      <Link>Linker\Mono.Linker.Steps\LoadI18nAssemblies.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\LoadReferencesStep.cs">
+      <Link>Linker\Mono.Linker.Steps\LoadReferencesStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\MarkStep.cs">
+      <Link>Linker\Mono.Linker.Steps\MarkStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\OutputStep.cs">
+      <Link>Linker\Mono.Linker.Steps\OutputStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\RegenerateGuidStep.cs">
+      <Link>Linker\Mono.Linker.Steps\RegenerateGuidStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\ResolveFromAssemblyStep.cs">
+      <Link>Linker\Mono.Linker.Steps\ResolveFromAssemblyStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\ResolveFromXApiStep.cs">
+      <Link>Linker\Mono.Linker.Steps\ResolveFromXApiStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\ResolveFromXmlStep.cs">
+      <Link>Linker\Mono.Linker.Steps\ResolveFromXmlStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\ResolveStep.cs">
+      <Link>Linker\Mono.Linker.Steps\ResolveStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\SweepStep.cs">
+      <Link>Linker\Mono.Linker.Steps\SweepStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker.Steps\TypeMapStep.cs">
+      <Link>Linker\Mono.Linker.Steps\TypeMapStep.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\Annotations.cs">
+      <Link>Linker\Mono.Linker\Annotations.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\AssemblyAction.cs">
+      <Link>Linker\Mono.Linker\AssemblyAction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\AssemblyResolver.cs">
+      <Link>Linker\Mono.Linker\AssemblyResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\Driver.cs">
+      <Link>Linker\Mono.Linker\Driver.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\I18nAssemblies.cs">
+      <Link>Linker\Mono.Linker\I18nAssemblies.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\IXApiVisitor.cs">
+      <Link>Linker\Mono.Linker\IXApiVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\LinkContext.cs">
+      <Link>Linker\Mono.Linker\LinkContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\MethodAction.cs">
+      <Link>Linker\Mono.Linker\MethodAction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\Pipeline.cs">
+      <Link>Linker\Mono.Linker\Pipeline.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\TypePreserve.cs">
+      <Link>Linker\Mono.Linker\TypePreserve.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\linker\linker\Mono.Linker\XApiReader.cs">
+      <Link>Linker\Mono.Linker\XApiReader.cs</Link>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\Aot.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\GenerateBundledAssemblies.cs" />
+    <Compile Include="Tasks\GenerateLauncher.cs" />
+    <Compile Include="Tasks\ResolveAssemblies.cs" />
+    <Compile Include="Utilities\DirectoryAssemblyResolver.cs" />
+    <Compile Include="Utilities\MSBuildExtensions.cs" />
+    <Compile Include="Utilities\Symbols.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Xamarin.Windows.Common.targets">
+      <Link>Xamarin.Windows.Common.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Xamarin.Windows.CSharp.targets">
+      <Link>Xamarin.Windows.CSharp.targets</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="CreateNativeWindowsExecutable.vcxproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\external\cecil\Mono.Cecil.csproj">
+      <Project>{d68133bd-1e63-496e-9ede-4fbdbf77b486}</Project>
+      <Name>Mono.Cecil</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Platform.h" />
+    <Content Include="Platform.c" />
+    <Content Include="LauncherTemplate.c" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,189 @@
+<!--
+***********************************************************************************************
+Xamarin.Windows.Common.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+  created a backup copy.  Incorrect changes to this file will make it
+  impossible to load or build your projects from the command-line or the IDE.
+
+This file imports the version- and platform-specific targets for the project importing
+this file. This file also defines targets to produce an error if the specified targets
+file does not exist, but the project is built anyway (command-line or IDE build).
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <XamarinWindowsBuildTasksPath Condition="!Exists('Xamarin.Windows.Build.Tasks.dll')">Xamarin.Windows.Build.Tasks\bin\$(Configuration)\</XamarinWindowsBuildTasksPath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Xamarin.Windows.Tasks.ResolveAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+  <UsingTask TaskName="Xamarin.Windows.Tasks.Aot" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+  <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateLauncher" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+  <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateBundledAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+
+  <!--
+  *******************************************
+    Extensibility hook that allows VS to
+    provide extra behavior without modifying 
+    the core targets.
+  *******************************************
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).Before.targets" 
+          Condition="Exists('$(MSBuildThisFileDirectory)$(MSBuildThisFileName).Before.targets')"/>
+
+  <!-- Defaults -->
+  <PropertyGroup>
+    <OverrideTargetFramework>false</OverrideTargetFramework>
+    <AssemblySearchPaths>$([System.String]::Copy('$(AssemblySearchPaths)').Replace('{GAC}',''))</AssemblySearchPaths>
+    <AssemblySearchPaths Condition="'$(MSBuildRuntimeVersion)' != ''">$(AssemblySearchPaths.Split(';'))</AssemblySearchPaths>
+    <TargetFrameworkIdentifier>Xamarin.Windows</TargetFrameworkIdentifier>
+    <IsDebugBuild Condition="'$(Configuration)' == 'Debug'">True</IsDebugBuild>
+    <AotOutputFileType Condition="'$(AotOutputFileType)' == ''"></AotOutputFileType> <!-- Aot task defaults to Obj -->
+    <AotOutputFileExtension Condition="'$(AotOutputFileExtension)' == ''"></AotOutputFileExtension> <!-- Aot task defaults to .obj/.s/.dll depending on AotOutputFileType value -->
+    <LauncherFileName Condition="'$(LauncherFileName)' == ''"></LauncherFileName> <!-- Use GenerateLauncher task's default -->
+    <UseCustomPlatformImpl Condition="'$(UseCustomPlatformImpl)' == ''">False</UseCustomPlatformImpl>
+  </PropertyGroup>
+
+  <!-- Allows to use the BCL and toolchain from a Mono dev root -->
+  <PropertyGroup Condition="'$(MonoDevRoot)' != ''">
+    <_TargetFrameworkDirectory>$(MonoDevRoot)\mcs\class\lib\net_4_x;$(MonoDevRoot)\mcs\class\lib\net_4_x\Facades</_TargetFrameworkDirectory>
+    <MonoDevConfiguration Condition="'$(MonoDevConfiguration)' == ''">Release</MonoDevConfiguration>
+    <AotCompilerPlatform Condition="'$(AotCompilerPlatform)' == ''">x64</AotCompilerPlatform>
+    <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MonoDevRoot)\msvc\build\sgen\$(AotCompilerPlatform)\bin\$(MonoDevConfiguration)\mono-sgen.exe</AotCompilerPath>
+    <MonoLibsPath Condition="'$(MonoLibsPath)' == ''">$(MonoDevRoot)\msvc\build\sgen\$(AotCompilerPlatform)\lib\$(MonoDevConfiguration)\</MonoLibsPath>
+    <OverrideTargetFramework>true</OverrideTargetFramework>
+  </PropertyGroup>
+
+  <!-- Directories and files -->
+  <PropertyGroup>
+    <AotOutputDirectory>$(IntermediateOutputPath)Aot\</AotOutputDirectory>
+    <GeneratedCodeOutputDirectory>$(IntermediateOutputPath)Gen\</GeneratedCodeOutputDirectory>
+    <IntermediateAssemblyDirectory>$(IntermediateOutputPath)Assem\</IntermediateAssemblyDirectory>
+    <IntermediateNativeOutputDirectory>$(IntermediateOutputPath)Native\</IntermediateNativeOutputDirectory>
+    <NativeExeOutputDirectory>$(OutputPath)Native\</NativeExeOutputDirectory>
+    <GeneratedLauncherFile>$(GeneratedCodeOutputDirectory)launcher.c</GeneratedLauncherFile>
+  </PropertyGroup>
+
+  <!-- Toolchain setup -->
+  <PropertyGroup>
+    <AotCompilerPlatform Condition="'$(AotCompilerPlatform)' == ''">x64</AotCompilerPlatform>
+    <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\mono.exe</AotCompilerPath>
+    <VSInstall Condition="'$(VSInstall)' == ''">$([System.IO.Directory]::GetParent("$(VSSDK140Install)").Parent.FullName)\</VSInstall>
+    <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == ''">$(VSInstall)VC\ClangC2\bin\amd64</NativeToolchainPaths>
+    <NativeCompilerConfiguration Condition="'$(NativeCompilerConfiguration)' == ''">Release</NativeCompilerConfiguration>
+  </PropertyGroup>
+
+  <!-- When looking for related files to copy, look for Mono debugging files as well -->
+  <PropertyGroup>
+    <AllowedReferenceRelatedFileExtensions>
+      $(AllowedReferenceRelatedFileExtensions);
+      .dll.mdb;
+      .exe.mdb
+    </AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GetReferenceAssemblyPathsDependsOn>
+      _SetTargetFrameworkDirectory;
+      $(GetReferenceAssemblyPathsDependsOn);
+    </GetReferenceAssemblyPathsDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      _CleanXamarinWindowsOutputs;
+    </CleanDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_SetTargetFrameworkDirectory">
+    <PropertyGroup>
+      <TargetFrameworkDirectory Condition="'$(_TargetFrameworkDirectory)' != ''">$(_TargetFrameworkDirectory)</TargetFrameworkDirectory>
+      <TargetFrameworkMoniker Condition="!$(OverrideTargetFramework)">$(TargetFrameworkIdentifier),Version=1.0</TargetFrameworkMoniker>
+      <TargetFrameworkMoniker Condition="$(OverrideTargetFramework)"></TargetFrameworkMoniker>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="_ResolveAssemblies" DependsOnTargets="GetReferenceAssemblyPaths;Build">
+    <!--- Remove the ImplicitlyExpandDesignTimeFacades assemblies. We have already build the app there are not required for packaging  -->
+    <ItemGroup>
+      <FilteredAssemblies Include="@(ReferencePath)" Condition="'%(ReferencePath.ResolvedFrom)' != 'ImplicitlyExpandDesignTimeFacades'" />
+    </ItemGroup>
+    <!-- Find all the assemblies this app requires -->
+    <ResolveAssemblies
+      Assemblies="$(OutDir)$(TargetFileName);@(FilteredAssemblies)"
+      I18nAssemblies="$(I18nAssemblies)"
+      ReferenceAssembliesDirectory="$(TargetFrameworkDirectory)">
+        <Output TaskParameter="ResolvedAssemblies" ItemName="ResolvedAssemblies" />
+        <Output TaskParameter="ResolvedUserAssemblies" ItemName="ResolvedUserAssemblies" />
+        <Output TaskParameter="ResolvedFrameworkAssemblies" ItemName="ResolvedFrameworkAssemblies" />
+        <Output TaskParameter="ResolvedPdbFiles" ItemName="ResolvedPdbFiles" />
+        <Output TaskParameter="ResolvedMdbFiles" ItemName="ResolvedMdbFiles" />
+    </ResolveAssemblies>
+  </Target>
+
+  <Target Name="_AotCompileAssemblies" DependsOnTargets="_ResolveAssemblies">
+    <Aot AotCompilerPath="$(AotCompilerPath)" ReferenceAssembliesDirectory="$(TargetFrameworkDirectory)"
+         NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
+         ResolvedFrameworkAssemblies="@(ResolvedFrameworkAssemblies)" ResolvedUserAssemblies="@(ResolvedUserAssemblies)"
+         AotOutputDirectory="$(AotOutputDirectory)" 
+         IntermediateAssemblyDirectory="$(IntermediateAssemblyDirectory)" IsDebug="$(IsDebugBuild)" 
+         GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)">
+      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedAotFiles" />
+    </Aot>
+  </Target>
+
+  <Target Name="_GenerateLauncher" DependsOnTargets="_ResolveAssemblies">
+    <GenerateLauncher AotAssemblies="@(ResolvedAssemblies)" BundledAssemblies="@(ResolvedAssemblies)"
+        OutputDirectory="$(GeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
+        UseCustomPlatformImpl="$(UseCustomPlatformImpl)">
+      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
+    </GenerateLauncher>
+  </Target>
+
+  <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_ResolveAssemblies">
+    <GenerateBundledAssemblies Assemblies="@(ResolvedAssemblies)" OutputDirectory="$(GeneratedCodeOutputDirectory)">
+      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
+    </GenerateBundledAssemblies>
+  </Target>
+
+  <Target Name="_CreateNativeWindowsExecutable" DependsOnTargets="_AotCompileAssemblies;_GenerateLauncher;_GenerateBundledAssemblies"> 
+    <PropertyGroup>
+      <CurrentDir>$([System.IO.Path]::GetFullPath('.'))\</CurrentDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <Inputs Include="@(GeneratedSourceFiles->'$(CurrentDir)%(Identity)')"/>
+      <Inputs Include="@(GeneratedAotFiles->'$(CurrentDir)%(Identity)')"/>
+      <Inputs Include="$(MonoLibsPath)libmonoruntime-sgen.lib"/>
+      <Inputs Include="$(MonoLibsPath)eglib.lib"/>
+      <Inputs Include="$(MonoLibsPath)libgcmonosgen.lib"/>
+      <Inputs Include="$(MonoLibsPath)libmono-static-sgen.lib"/>
+      <Inputs Include="$(MonoLibsPath)libmonoutils.lib"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <Inputs>@(Inputs)</Inputs>
+      <SubOutDir>$(CurrentDir)$(NativeExeOutputDirectory)</SubOutDir>
+      <SubIntDir>$(CurrentDir)$(IntermediateNativeOutputDirectory)</SubIntDir>
+      <SubProps>OutDir=$(SubOutDir);IntDir=$(SubIntDir);Configuration=$(NativeCompilerConfiguration);Platform=$(AotCompilerPlatform);TargetName=$(TargetName);Inputs=$(Inputs)</SubProps>
+    </PropertyGroup>
+    <MSBuild Projects="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" Properties="$(SubProps)"/>
+  </Target>
+
+  <Target Name="_CleanXamarinWindowsOutputs">
+    <RemoveDir Directories="$(AotOutputDirectory);$(IntermediateAssemblyDirectory);$(GeneratedCodeOutputDirectory);$(IntermediateNativeOutputDirectory);$(NativeExeOutputDirectory)" />  
+  </Target>
+
+  <!--
+  *******************************************
+    Extensibility hook that allows VS to
+    provide extra behavior without modifying 
+    the core targets.
+  *******************************************
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).After.targets" 
+          Condition="Exists('$(MSBuildThisFileDirectory)$(MSBuildThisFileName).After.targets')"/>
+
+</Project>

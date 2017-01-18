@@ -1,0 +1,9 @@
+[submodule "external/cecil"]
+	path = external/cecil
+	url = https://github.com/mono/cecil.git
+[submodule "external/linker"]
+	path = external/linker
+	url = https://github.com/mono/linker.git
+[submodule "external/mono"]
+	path = external/mono
+	url = https://github.com/mono/mono.git
