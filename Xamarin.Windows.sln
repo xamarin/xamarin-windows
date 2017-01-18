@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Windows.Build.Tasks", "msbuild\Xamarin.Windows.Build.Tasks\Xamarin.Windows.Build.Tasks.csproj", "{36907F0D-086C-4144-A532-4E277EA0CEFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Windows.Tests", "msbuild\Xamarin.Windows.Tests\Xamarin.Windows.Tests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Windows.Build.Tests", "msbuild\Xamarin.Windows.Build.Tests\Xamarin.Windows.Build.Tests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{36907F0D-086C-4144-A532-4E277EA0CEFF} = {36907F0D-086C-4144-A532-4E277EA0CEFF}
 	EndProjectSection
