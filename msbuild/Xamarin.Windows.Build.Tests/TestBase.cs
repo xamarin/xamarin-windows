@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 using NUnit.Framework;
 
-namespace Xamarin.Windows.Tests
+namespace Xamarin.Windows.Build.Tests
 {
 	public abstract class TestBase
 	{
