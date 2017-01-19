@@ -40,7 +40,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <AssemblySearchPaths>$([System.String]::Copy('$(AssemblySearchPaths)').Replace('{GAC}',''))</AssemblySearchPaths>
     <AssemblySearchPaths Condition="'$(MSBuildRuntimeVersion)' != ''">$(AssemblySearchPaths.Split(';'))</AssemblySearchPaths>
     <TargetFrameworkIdentifier>Xamarin.Windows</TargetFrameworkIdentifier>
-    <IsDebugBuild Condition="'$(Configuration)' == 'Debug'">True</IsDebugBuild>
+    <GenerateDebuggableAotModules Condition=" '$(GenerateDebuggableAotModules)' == '' And $(Configuration.Contains('Debug')) ">True</GenerateDebuggableAotModules>
     <AotOutputFileType Condition="'$(AotOutputFileType)' == ''"></AotOutputFileType> <!-- Aot task defaults to Obj -->
     <AotOutputFileExtension Condition="'$(AotOutputFileExtension)' == ''"></AotOutputFileExtension> <!-- Aot task defaults to .obj/.s/.dll depending on AotOutputFileType value -->
     <LauncherFileName Condition="'$(LauncherFileName)' == ''"></LauncherFileName> <!-- Use GenerateLauncher task's default -->
@@ -143,7 +143,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
          NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
          ResolvedFrameworkAssemblies="@(ResolvedFrameworkAssemblies)" ResolvedUserAssemblies="@(ResolvedUserAssemblies)"
          AotOutputDirectory="$(AotOutputDirectory)" 
-         IntermediateAssemblyDirectory="$(IntermediateAssemblyDirectory)" IsDebug="$(IsDebugBuild)" 
+         IntermediateAssemblyDirectory="$(IntermediateAssemblyDirectory)" IsDebug="$(GenerateDebuggableAotModules)" 
          GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedAotFiles" />
     </Aot>
