@@ -26,6 +26,11 @@ namespace Xamarin.Windows.Build.Tests
 			@"$(TestProjectsRoot)\ClassLibrary\bin\Debug\ClassLibrary.dll"
 		};
 
+		private static readonly string IntermediateOutputPath = Path.Combine("obj", "Debug", "XW");
+		private static readonly string AotOutputDirectory = Path.Combine(IntermediateOutputPath, "Aot");
+		private static readonly string GeneratedCodeOutputDirectory = Path.Combine(IntermediateOutputPath, "Gen");
+		private static readonly string NativeExeOutputDirectory = Path.Combine("bin", "Debug", "Native");
+
 		private void ResolveAssemblies(string prefix, object properties = null)
 		{
 			var result = BuildProject("ConsoleApp", targets: "ResolveAssembliesTest", properties: properties);
@@ -61,7 +66,7 @@ namespace Xamarin.Windows.Build.Tests
 		[Test]
 		public void Aot()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), "obj", "Debug", "Aot");
+			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), AotOutputDirectory);
 			var result = BuildProject("ConsoleApp", targets: "AotTest", properties: new { MonoDevRoot });
 			var actualObjectFiles = Directory.GetFiles(outputDir, "*.obj", SearchOption.AllDirectories)
 					.Select(Path.GetFileName).OrderBy(s => s);
@@ -70,14 +75,14 @@ namespace Xamarin.Windows.Build.Tests
 					.Select(s => s + ".obj").OrderBy(s => s);
 			CollectionAssert.AreEquivalent(expectedObjectFiles, actualObjectFiles);
 			var actualGeneratedAotFiles = GetPathItems(result, "GeneratedAotFiles");
-			var expectedGeneratedAotFiles = expectedObjectFiles.Select(f => $"obj\\Debug\\Aot\\{f}");
+			var expectedGeneratedAotFiles = expectedObjectFiles.Select(f => Path.Combine(AotOutputDirectory, f));
 			CollectionAssert.AreEquivalent(expectedGeneratedAotFiles, actualGeneratedAotFiles);
 		}
 
 		[Test]
 		public void AotAsmOnly()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), "obj", "Debug", "Aot");
+			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), AotOutputDirectory);
 			var result = BuildProject("ConsoleApp", targets: "AotTest", properties: new { MonoDevRoot, AotOutputFileType = "Asm" });
 			var actualAsmFiles = Directory.GetFiles(outputDir, "*.s", SearchOption.AllDirectories)
 					.Select(Path.GetFileName).OrderBy(s => s);
@@ -86,17 +91,16 @@ namespace Xamarin.Windows.Build.Tests
 					.Select(s => s + ".s").OrderBy(s => s);
 			CollectionAssert.AreEquivalent(expectedAsmFiles, actualAsmFiles);
 			var actualGeneratedAotFiles = GetPathItems(result, "GeneratedAotFiles");
-			var expectedGeneratedAotFiles = expectedAsmFiles.Select(f => $"obj\\Debug\\Aot\\{f}");
+			var expectedGeneratedAotFiles = expectedAsmFiles.Select(f => Path.Combine(AotOutputDirectory, f));
 			CollectionAssert.AreEquivalent(expectedGeneratedAotFiles, actualGeneratedAotFiles);
 		}
 
 		[Test]
 		public void GenerateLauncher()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), "obj", "Debug");
 			var result = BuildProject("ConsoleApp", targets: "GenerateLauncherTest", properties: new { MonoDevRoot });
 			var expectedGeneratedSourceFiles = new[] {"launcher.c", "platform.c", "platform.h"}
-					.Select(f => $"obj\\Debug\\Gen\\{f}");
+					.Select(f => Path.Combine(GeneratedCodeOutputDirectory, f));
 			var actualGeneratedSourceFiles = GetPathItems(result, "GeneratedSourceFiles");
 			CollectionAssert.AreEquivalent(expectedGeneratedSourceFiles, actualGeneratedSourceFiles);
 		}
@@ -104,7 +108,7 @@ namespace Xamarin.Windows.Build.Tests
 		[Test]
 		public void GenerateBundledAssemblies()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), "obj", "Debug", "Gen");
+			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), GeneratedCodeOutputDirectory);
 			var result = BuildProject("ConsoleApp", targets: "GenerateBundledAssembliesTest", properties: new { MonoDevRoot });
 			var actualCFiles = Directory.GetFiles(outputDir, "*.c", SearchOption.AllDirectories)
 					.Select(Path.GetFileName).OrderBy(s => s);
@@ -114,14 +118,14 @@ namespace Xamarin.Windows.Build.Tests
 					.Select(s => s + ".c").OrderBy(s => s);
 			CollectionAssert.AreEquivalent(expectedCFiles, actualCFiles);
 			var actualGeneratedSourceFiles = GetPathItems(result, "GeneratedSourceFiles");
-			var expectedGeneratedSourceFiles = expectedCFiles.Select(f => $"obj\\Debug\\Gen\\{f}");
+			var expectedGeneratedSourceFiles = expectedCFiles.Select(f => Path.Combine(GeneratedCodeOutputDirectory, f));
 			CollectionAssert.AreEquivalent(expectedGeneratedSourceFiles, actualGeneratedSourceFiles);
 		}
 
 		[Test]
 		public void CreateNativeWindowsExecutable()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), "bin", "Debug", "Native");
+			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), NativeExeOutputDirectory);
 			var exe = Path.Combine(outputDir, "ConsoleApp.exe");
 			var result = BuildProject("ConsoleApp", targets: "CreateNativeWindowsExecutableTest", properties: new { MonoDevRoot });
 			Assert.IsTrue(File.Exists(exe));

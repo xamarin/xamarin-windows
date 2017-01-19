@@ -59,12 +59,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <!-- Directories and files -->
   <PropertyGroup>
-    <AotOutputDirectory>$(IntermediateOutputPath)Aot\</AotOutputDirectory>
-    <GeneratedCodeOutputDirectory>$(IntermediateOutputPath)Gen\</GeneratedCodeOutputDirectory>
-    <IntermediateAssemblyDirectory>$(IntermediateOutputPath)Assem\</IntermediateAssemblyDirectory>
-    <IntermediateNativeOutputDirectory>$(IntermediateOutputPath)Native\</IntermediateNativeOutputDirectory>
-    <NativeExeOutputDirectory>$(OutputPath)Native\</NativeExeOutputDirectory>
-    <GeneratedLauncherFile>$(GeneratedCodeOutputDirectory)launcher.c</GeneratedLauncherFile>
+    <_XWIntermediateOutputPath>$(IntermediateOutputPath)XW\</_XWIntermediateOutputPath>
+    <_XWAotOutputDirectory>$(_XWIntermediateOutputPath)Aot\</_XWAotOutputDirectory>
+    <_XWGeneratedCodeOutputDirectory>$(_XWIntermediateOutputPath)Gen\</_XWGeneratedCodeOutputDirectory>
+    <_XWIntermediateAssembliesDirectory>$(_XWIntermediateOutputPath)Assem\</_XWIntermediateAssembliesDirectory>
+    <_XWIntermediateNativeOutputDirectory>$(_XWIntermediateOutputPath)Native\</_XWIntermediateNativeOutputDirectory>
+    <_XWNativeExeOutputDirectory>$(OutputPath)Native\</_XWNativeExeOutputDirectory>
   </PropertyGroup>
 
   <!-- Toolchain setup -->
@@ -142,8 +142,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Aot AotCompilerPath="$(AotCompilerPath)" AotCompilerBclPath="$(TargetFrameworkDirectory)"
          NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
          ResolvedFrameworkAssemblies="@(ResolvedFrameworkAssemblies)" ResolvedUserAssemblies="@(ResolvedUserAssemblies)"
-         AotOutputDirectory="$(AotOutputDirectory)" 
-         IntermediateAssemblyDirectory="$(IntermediateAssemblyDirectory)" IsDebug="$(GenerateDebuggableAotModules)" 
+         AotOutputDirectory="$(_XWAotOutputDirectory)" 
+         IntermediateAssemblyDirectory="$(_XWIntermediateAssembliesDirectory)" IsDebug="$(GenerateDebuggableAotModules)" 
          GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedAotFiles" />
     </Aot>
@@ -151,14 +151,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <Target Name="_GenerateLauncher" DependsOnTargets="_ResolveAssemblies">
     <GenerateLauncher AotAssemblies="@(ResolvedAssemblies)" BundledAssemblies="@(ResolvedAssemblies)"
-        OutputDirectory="$(GeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
+        OutputDirectory="$(_XWGeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
         UseCustomPlatformImpl="$(UseCustomPlatformImpl)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
     </GenerateLauncher>
   </Target>
 
   <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_ResolveAssemblies">
-    <GenerateBundledAssemblies Assemblies="@(ResolvedAssemblies)" OutputDirectory="$(GeneratedCodeOutputDirectory)">
+    <GenerateBundledAssemblies Assemblies="@(ResolvedAssemblies)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
     </GenerateBundledAssemblies>
   </Target>
@@ -178,15 +178,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </ItemGroup>
     <PropertyGroup>
       <Inputs>@(Inputs)</Inputs>
-      <SubOutDir>$(CurrentDir)$(NativeExeOutputDirectory)</SubOutDir>
-      <SubIntDir>$(CurrentDir)$(IntermediateNativeOutputDirectory)</SubIntDir>
+      <SubOutDir>$(CurrentDir)$(_XWNativeExeOutputDirectory)</SubOutDir>
+      <SubIntDir>$(CurrentDir)$(_XWIntermediateNativeOutputDirectory)</SubIntDir>
       <SubProps>OutDir=$(SubOutDir);IntDir=$(SubIntDir);Configuration=$(NativeCompilerConfiguration);Platform=$(AotCompilerPlatform);TargetName=$(TargetName);Inputs=$(Inputs)</SubProps>
     </PropertyGroup>
     <MSBuild Projects="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" Properties="$(SubProps)"/>
   </Target>
 
   <Target Name="_CleanXamarinWindowsOutputs">
-    <RemoveDir Directories="$(AotOutputDirectory);$(IntermediateAssemblyDirectory);$(GeneratedCodeOutputDirectory);$(IntermediateNativeOutputDirectory);$(NativeExeOutputDirectory)" />  
+    <RemoveDir Directories="$(_XWIntermediateOutputPath);$(_XWNativeExeOutputDirectory)" />  
   </Target>
 
   <!--
