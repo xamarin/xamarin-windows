@@ -44,7 +44,7 @@ namespace Xamarin.Windows.Tasks
 		public ITaskItem[] ResolvedUserAssemblies { get; set; }
 
 		[Required]
-		public string ReferenceAssembliesDirectory { get; set; }
+		public string AotCompilerBclPath { get; set; }
 
 		[Required]
 		public string AotOutputDirectory { get; set; }
@@ -88,7 +88,7 @@ namespace Xamarin.Windows.Tasks
 
 			Log.LogDebugMessage("Aot Task");
 			Log.LogDebugMessage("  Environment.CurrentDirectory: {0}", Environment.CurrentDirectory);
-			Log.LogDebugMessage("  ReferenceAssembliesDirectory: {0}", ReferenceAssembliesDirectory);
+			Log.LogDebugMessage("  AotCompilerBclPath: {0}", AotCompilerBclPath);
 			Log.LogDebugMessage("  AotOutputDirectory: {0}", AotOutputDirectory);
 			Log.LogDebugMessage("  IntermediateAssemblyDirectory: {0}", IntermediateAssemblyDirectory);
 			Log.LogDebugMessage("  AotCompilerPath: {0}", AotCompilerPath);
@@ -106,9 +106,11 @@ namespace Xamarin.Windows.Tasks
 
 			var outputFiles = new List<string>();
 
+			// Calculate the MONO_PATH we'll use when invoking the AOT compiler. This is the concatenation
+			// of AotCompilerBclPath and the dir of each assembly we will compile.
 			var assembliesPath =
 				string.Join(";",
-					ReferenceAssembliesDirectory
+					AotCompilerBclPath
 						.Split(';').Where(p => !string.IsNullOrEmpty(p)).Select(p => Path.GetFullPath(p))
 						.Union(
 							ResolvedFrameworkAssemblies

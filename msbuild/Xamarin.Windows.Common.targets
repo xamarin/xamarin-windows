@@ -139,7 +139,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </Target>
 
   <Target Name="_AotCompileAssemblies" DependsOnTargets="_ResolveAssemblies">
-    <Aot AotCompilerPath="$(AotCompilerPath)" ReferenceAssembliesDirectory="$(TargetFrameworkDirectory)"
+    <Aot AotCompilerPath="$(AotCompilerPath)" AotCompilerBclPath="$(TargetFrameworkDirectory)"
          NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
          ResolvedFrameworkAssemblies="@(ResolvedFrameworkAssemblies)" ResolvedUserAssemblies="@(ResolvedUserAssemblies)"
          AotOutputDirectory="$(AotOutputDirectory)" 
