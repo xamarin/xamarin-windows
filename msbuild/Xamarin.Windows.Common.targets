@@ -45,6 +45,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <AotOutputFileExtension Condition="'$(AotOutputFileExtension)' == ''"></AotOutputFileExtension> <!-- Aot task defaults to .obj/.s/.dll depending on AotOutputFileType value -->
     <LauncherFileName Condition="'$(LauncherFileName)' == ''"></LauncherFileName> <!-- Use GenerateLauncher task's default -->
     <UseCustomPlatformImpl Condition="'$(UseCustomPlatformImpl)' == ''">False</UseCustomPlatformImpl>
+    <CreateNativeExecutableTarget Condition="'$(CreateNativeExecutableTarget)' == ''">_CreateNativeWindowsExecutable</CreateNativeExecutableTarget>
   </PropertyGroup>
 
   <!-- Allows to use the BCL and toolchain from a Mono dev root -->
@@ -100,6 +101,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </CleanDependsOn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <BuildDependsOn>
+      $(BuildDependsOn);
+      $(CreateNativeExecutableTarget);
+    </BuildDependsOn>
+  </PropertyGroup>
+
   <!-- Microsoft.CSharp.Targets adds the .NET mscorlib.dll to _ExplicitReference.
        Here we remove it and make sure @(Reference) contains mscorlib instead. -->
   <Target Name="_FixupMSCorlibReference">
@@ -120,7 +128,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyGroup>
   </Target>
 
-  <Target Name="_ResolveAssemblies" DependsOnTargets="GetReferenceAssemblyPaths;Build">
+  <Target Name="_ResolveAssemblies" DependsOnTargets="GetReferenceAssemblyPaths">
     <!--- Remove the ImplicitlyExpandDesignTimeFacades assemblies. We have already build the app there are not required for packaging  -->
     <ItemGroup>
       <FilteredAssemblies Include="@(ReferencePath)" Condition="'%(ReferencePath.ResolvedFrom)' != 'ImplicitlyExpandDesignTimeFacades'" />

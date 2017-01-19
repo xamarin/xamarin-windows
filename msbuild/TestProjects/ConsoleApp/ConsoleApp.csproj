@@ -54,8 +54,13 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\..\..\Xamarin.Windows.CSharp.targets" />
+  <PropertyGroup>
+    <!-- Xamarin.Windows.Common.targets hooks into the Build target by modifying
+         BuildDependsOn. This resets it so we can test individual targets. -->
+    <BuildDependsOn>BeforeBuild;CoreBuild;AfterBuild</BuildDependsOn>
+  </PropertyGroup>
   <Target Name="ResolveAssembliesTest" DependsOnTargets="Clean;Build;_ResolveAssemblies" />
-  <Target Name="AotTest" DependsOnTargets="Clean;_AotCompileAssemblies" />
+  <Target Name="AotTest" DependsOnTargets="Clean;Build;_AotCompileAssemblies" />
   <Target Name="GenerateLauncherTest" DependsOnTargets="Clean;Build;_GenerateLauncher" />
   <Target Name="GenerateBundledAssembliesTest" DependsOnTargets="Clean;Build;_GenerateBundledAssemblies" />
   <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_CreateNativeWindowsExecutable" />

@@ -76,7 +76,7 @@ must be changed to
 To run a full AOT compile of a `.csproj` run:
 
 ```
-MSBuild.exe /p:MonoDevRoot=C:\xw\external\mono /p:PathToXamarinWindows=C:\xw\msbuild /t:_CreateNativeWindowsExecutable /v:Detailed <csproj-file>
+MSBuild.exe /p:MonoDevRoot=C:\xw\external\mono /p:PathToXamarinWindows=C:\xw\msbuild /v:Detailed <csproj-file>
 ```
 
 The `.exe` should now be in the project's `bin/Debug/Native/` folder.
