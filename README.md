@@ -36,10 +36,12 @@ git submodule update --init --recursive
 
 ```bash
 cd external/mono/
-./autogen.sh --host=x86_64-w64-mingw32 --disable-boehm
+./autogen.sh --host=x86_64-w64-mingw32 --disable-boehm --with-runtime_preset=winaot
 export MONO_EXECUTABLE="`cygpath -u -a msvc\\\build\\\sgen\\\x64\\\bin\\\Release\\\mono-sgen.exe`"
+export VC_ROOT="/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
+export PATH="$VC_ROOT/ClangC2/bin/amd64:$VC_ROOT/bin/amd64":$PATH
 /cygdrive/c/Program\ Files\ \(x86\)/MSBuild/14.0/Bin/MSBuild.exe /p:PlatformToolset=v140 /p:Platform=x64 /p:Configuration=Release /p:MONO_TARGET_GC=sgen msvc/mono.sln
-make
+make -C mcs/
 ```
 
 ## Copy reference assemblies
@@ -53,12 +55,40 @@ cd C:\xw
 "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /p:MonoDevRoot=%cd%\external\mono msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
 ```
 
-## Build the MSBuild tasks
+## Create the MSBuild toolchain
 
-You should now be able to open the `Xamarin.Windows.sln` solution. Build it
-and try running the tests.
+The VS extension relies on the MSBuild files and the mono installation being
+installed under `C:\Program Files (x86)\MSBuild\Xamarin\Windows`.
+
+Run the following in an Administrator `cmd.exe`:
+```
+cd C:\xw
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /p:MonoDevRoot=%cd%\external\mono msbuild\CreateToolchain.proj
+```
+
+This step has to be repeated whenever you change the MSBuild files or tasks
+and want the changes to be picked up by the VS extension.
+
+## Build the Xamarin.Windows solution
+
+You should now be able to open the `Xamarin.Windows.sln` solution and build
+it.
 
 # Usage
+
+Launch the Xamarin.Windows.VisualStudio.Vsix project from within VS. Look for
+the Xamarin Windows templates when creating new projects.
+
+To run a full AOT compile of a `.csproj` from the command-line run:
+
+```
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /v:Detailed /t:BuildNative <csproj-file>
+```
+
+The native `.exe` should now be in the project's `bin/Debug/Native/` folder.
+
+
+# Converting an ordinary C# project to a Xamarin.Windows project
 
 For now one has to edit the `.csproj` file to make it a Xamarin.Windows
 project. The line
@@ -70,13 +100,13 @@ project. The line
 must be changed to 
 
 ```xml
-<Import Project="$(PathToXamarinWindows)\Xamarin.Windows.CSharp.targets" />
+<Import Project="$(MSBuildExtensionsPath)\Xamarin\Windows\Xamarin.Windows.CSharp.targets" />
 ```
 
-To run a full AOT compile of a `.csproj` run:
+Then add to line
 
-```
-MSBuild.exe /p:MonoDevRoot=C:\xw\external\mono /p:PathToXamarinWindows=C:\xw\msbuild /v:Detailed <csproj-file>
+```xml
+<ProjectTypeGuids>{8F3E2DF0-C35C-4265-82FC-BEA011F4A7ED};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
 ```
 
-The `.exe` should now be in the project's `bin/Debug/Native/` folder.
+to the first `<ProjectGroup>` section in the `.csproj` file.

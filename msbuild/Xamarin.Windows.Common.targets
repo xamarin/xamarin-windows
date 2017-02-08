@@ -16,7 +16,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <XamarinWindowsBuildTasksPath Condition="!Exists('Xamarin.Windows.Build.Tasks.dll')">Xamarin.Windows.Build.Tasks\bin\$(Configuration)\</XamarinWindowsBuildTasksPath>
+    <XamarinWindowsBuildTasksPath Condition="!Exists('$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks.dll')">Xamarin.Windows.Build.Tasks\bin\$(Configuration)\</XamarinWindowsBuildTasksPath>
   </PropertyGroup>
 
   <UsingTask TaskName="Xamarin.Windows.Tasks.ResolveAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
@@ -71,10 +71,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Toolchain setup -->
   <PropertyGroup>
     <AotCompilerPlatform Condition="'$(AotCompilerPlatform)' == ''">x64</AotCompilerPlatform>
-    <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\mono.exe</AotCompilerPath>
+    <AotCompilerConfiguration Condition="'$(AotCompilerConfiguration)' == ''">Release</AotCompilerConfiguration>
+    <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\mono-sgen.exe</AotCompilerPath>
     <VSInstall Condition="'$(VSInstall)' == ''">$([System.IO.Directory]::GetParent("$(VSSDK140Install)").Parent.FullName)\</VSInstall>
     <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == ''">$(VSInstall)VC\ClangC2\bin\amd64</NativeToolchainPaths>
     <NativeCompilerConfiguration Condition="'$(NativeCompilerConfiguration)' == ''">Release</NativeCompilerConfiguration>
+    <MonoLibsPath Condition="'$(MonoLibsPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\</MonoLibsPath>
   </PropertyGroup>
 
   <!-- When looking for related files to copy, look for Mono debugging files as well -->
@@ -101,11 +103,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </CleanDependsOn>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <BuildDependsOn>
-      $(BuildDependsOn);
+  <PropertyGroup Condition="'$(OutputType)' == 'Exe'">
+    <BuildNativeDependsOn>
+      Build;
       $(CreateNativeExecutableTarget);
-    </BuildDependsOn>
+    </BuildNativeDependsOn>
   </PropertyGroup>
 
   <!-- Microsoft.CSharp.Targets adds the .NET mscorlib.dll to _ExplicitReference.
@@ -192,6 +194,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyGroup>
     <MSBuild Projects="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" Properties="$(SubProps)"/>
   </Target>
+
+  <Target Name="BuildNative" DependsOnTargets="$(BuildNativeDependsOn)"/> 
 
   <Target Name="_CleanXamarinWindowsOutputs">
     <RemoveDir Directories="$(_XWIntermediateOutputPath);$(_XWNativeExeOutputDirectory)" />  
