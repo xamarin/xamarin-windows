@@ -3,16 +3,21 @@
 
   <PropertyGroup>
     <ReferenceAssembliesPath Condition="'$(ReferenceAssembliesPath)' == ''">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework</ReferenceAssembliesPath>  
-    <XamarinWindowsTargetPath>$(ReferenceAssembliesPath)\Xamarin.Windows\v1.0</XamarinWindowsTargetPath>  
+    <XamarinWindowsTargetPath>$(ReferenceAssembliesPath)\Xamarin.Windows\v1.0</XamarinWindowsTargetPath>
+    <BclProfile>winaot</BclProfile>
+    <_BclSourcePath>$(MonoDevRoot)\mcs\class\lib\$(BclProfile)</_BclSourcePath>
   </PropertyGroup>  
 
   <Target Name="Build">
     <Error Text="The MonoDevRoot property must be set on the command line." Condition="'$(MonoDevRoot)' == ''"/>
+    <Error Text="The BCL source directory '$(_BclSourcePath)' does not exist." Condition="!Exists('$(_BclSourcePath)')"/>
     <RemoveDir Directories="$(XamarinWindowsTargetPath)" Condition="Exists('$(XamarinWindowsTargetPath)')"/>
     <ItemGroup>
-      <Assemblies Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\*.dll"/>
-      <PDBs Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\*.pdb"/>
-      <FacadeAssemblies Include="$(MonoDevRoot)\mcs\class\lib\net_4_x\Facades\*.dll"/>
+      <Assemblies Include="$(_BclSourcePath)\*.dll"/>
+      <Assemblies Remove="$(_BclSourcePath)\*.dll.dll"/>
+      <PDBCandidates Include="@(Assemblies->'$(_BclSourcePath)\%(Filename).pdb')"/>
+      <PDBs Include="@(PDBCandidates)" Condition="Exists('%(Identity)')"/>
+      <FacadeAssemblies Include="$(_BclSourcePath)\Facades\*.dll"/>
     </ItemGroup> 
     <Copy SourceFiles="@(Assemblies)" 
           DestinationFiles="@(Assemblies->'$(XamarinWindowsTargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
