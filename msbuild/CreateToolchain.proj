@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <XamarinWindowsMSBuildPath Condition="'$(XamarinWindowsMSBuildPath)' == ''">C:\Program Files (x86)\MSBuild\Xamarin\Windows</XamarinWindowsMSBuildPath>
+  </PropertyGroup>
+
+  <Target Name="Build">
+    <Error Text="The MonoDevRoot property must be set on the command line." Condition="'$(MonoDevRoot)' == ''"/>
+
+    <PropertyGroup>
+      <ToolchainsBuildPath>$(MonoDevRoot)\msvc\build\toolchains</ToolchainsBuildPath>
+      <ToolchainsInstallPath>$(XamarinWindowsMSBuildPath)</ToolchainsInstallPath>
+      <CommonBuildProperties>PlatformToolset=v140;MONO_TARGET_GC=sgen;MONO_BUILD_DIR_PREFIX=$(ToolchainsBuildPath)\</CommonBuildProperties>
+    </PropertyGroup>
+
+    <MSBuild Projects="$(MonoDevRoot)\msvc\mono.sln" BuildInParallel="true" Properties="$(CommonBuildProperties);Platform=x64;Configuration=Release" Condition="'$(SkipMonoBuild)' != 'true'"/>
+    <MSBuild Projects="$(MonoDevRoot)\msvc\mono.sln" BuildInParallel="true" Properties="$(CommonBuildProperties);Platform=x64;Configuration=Debug" Condition="'$(SkipMonoBuild)' != 'true'"/>
+    <MSBuild Projects="$(MonoDevRoot)\msvc\mono.sln" BuildInParallel="true" Properties="$(CommonBuildProperties);Platform=Win32;Configuration=Release" Condition="'$(SkipMonoBuild)' != 'true'"/>
+    <MSBuild Projects="$(MonoDevRoot)\msvc\mono.sln" BuildInParallel="true" Properties="$(CommonBuildProperties);Platform=Win32;Configuration=Debug" Condition="'$(SkipMonoBuild)' != 'true'"/>
+    <MSBuild Projects="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\Xamarin.Windows.Build.Tasks.csproj" BuildInParallel="true" Properties="Configuration=Release"/>
+
+    <ItemGroup>
+      <Configurations Include="Release;Debug"/>
+      <Platforms Include="Win32;x64"/>
+      <_Files Include="mono-sgen.exe;mono-2.0-sgen.dll;mono-sgen.pdb;mono-2.0-sgen.pdb;MonoPosixHelper.dll;MonoPosixHelper.pdb">
+        <Configuration>%(Configurations.Identity)</Configuration>
+        <Folder>bin</Folder>
+      </_Files>
+      <_Files Include="eglib.lib;libgc.lib;libgcmonosgen.lib;libmonoruntime-sgen.lib;libmono-static-sgen.lib;libmonoutils.lib;mono-2.0-sgen.lib;MonoPosixHelper.lib">
+        <Configuration>%(Configurations.Identity)</Configuration>
+        <Folder>lib</Folder>
+      </_Files>
+      <Files Include="@(_Files)">
+        <Platform>%(Platforms.Identity)</Platform>
+      </Files>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(Files -> '$(ToolchainsBuildPath)\%(Platform)\%(Folder)\%(Configuration)\%(Identity)')" DestinationFiles="@(Files -> '$(ToolchainsInstallPath)\%(Platform)\%(Configuration)\%(Identity)')"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Common.Targets" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.CSharp.Targets" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Xamarin.Windows.Build.Tasks.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
+
+  </Target>
+
+</Project>
