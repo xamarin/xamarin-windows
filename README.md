@@ -90,8 +90,7 @@ The native `.exe` should now be in the project's `bin/Debug/Native/` folder.
 
 # Converting an ordinary C# project to a Xamarin.Windows project
 
-For now one has to edit the `.csproj` file to make it a Xamarin.Windows
-project. The line
+Edit the `.csproj` file to make it a Xamarin.Windows project. The line
 
 ```xml
 <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -103,7 +102,7 @@ must be changed to
 <Import Project="$(MSBuildExtensionsPath)\Xamarin\Windows\Xamarin.Windows.CSharp.targets" />
 ```
 
-Then add to line
+Then add the line
 
 ```xml
 <ProjectTypeGuids>{8F3E2DF0-C35C-4265-82FC-BEA011F4A7ED};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
