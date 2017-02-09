@@ -13,8 +13,6 @@ namespace Xamarin.Windows.Build.Tests
 		private static readonly string[] ConsoleAppFrameworkAssemblies = {
 			"mscorlib.dll",
 			"System.dll",
-			"System.Configuration.dll",
-			"System.Security.dll",
 			"System.Xml.dll",
 			"I18N.dll",
 			"I18N.West.dll",

@@ -24,7 +24,7 @@ namespace Xamarin.Windows.Build.Tests
 			var currentDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
 			TestProjectsRoot = Canonicalize(Path.Combine(currentDir, @"..\..\..\TestProjects"));
 			MonoDevRoot = Canonicalize(Path.Combine(currentDir, @"..\..\..\..\external\mono"));
-			MonoDevBcl = Canonicalize(Path.Combine(MonoDevRoot, @"mcs\class\lib\net_4_x"));
+			MonoDevBcl = Canonicalize(Path.Combine(MonoDevRoot, @"mcs\class\lib\winaot"));
 			ReferenceAssemblies = @"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Xamarin.Windows\v1.0";
 		}
 

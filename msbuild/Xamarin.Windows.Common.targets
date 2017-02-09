@@ -50,7 +50,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <!-- Allows to use the BCL and toolchain from a Mono dev root -->
   <PropertyGroup Condition="'$(MonoDevRoot)' != ''">
-    <_TargetFrameworkDirectory>$(MonoDevRoot)\mcs\class\lib\net_4_x;$(MonoDevRoot)\mcs\class\lib\net_4_x\Facades</_TargetFrameworkDirectory>
+    <_TargetFrameworkDirectory>$(MonoDevRoot)\mcs\class\lib\winaot;$(MonoDevRoot)\mcs\class\lib\winaot\Facades</_TargetFrameworkDirectory>
     <MonoDevConfiguration Condition="'$(MonoDevConfiguration)' == ''">Release</MonoDevConfiguration>
     <AotCompilerPlatform Condition="'$(AotCompilerPlatform)' == ''">x64</AotCompilerPlatform>
     <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MonoDevRoot)\msvc\build\sgen\$(AotCompilerPlatform)\bin\$(MonoDevConfiguration)\mono-sgen.exe</AotCompilerPath>
