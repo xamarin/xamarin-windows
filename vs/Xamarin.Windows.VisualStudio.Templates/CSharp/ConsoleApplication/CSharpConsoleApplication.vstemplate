@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>AOT Compiled Console Application (Xamarin)</Name>
+    <Name>Console Application (Xamarin)</Name>
     <Description>A project for creating a fully Ahead-Of-Time compiled native command-line application in C#.</Description>
     <Icon>CSharpConsoleApplication.ico</Icon>
     <ProjectType>CSharp</ProjectType>

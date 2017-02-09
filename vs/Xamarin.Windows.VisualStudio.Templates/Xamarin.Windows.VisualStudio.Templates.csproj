@@ -77,10 +77,10 @@
   </ItemGroup>
   <ItemGroup>
     <VSTemplate Include="CSharp\ConsoleApplication\CSharpConsoleApplication.vstemplate">
-      <OutputSubPath>Windows\Xamarin</OutputSubPath>
+      <OutputSubPath>Windows\Xamarin AOT</OutputSubPath>
     </VSTemplate>
     <VSTemplate Include="CSharp\StaticLibrary\CSharpStaticLibrary.vstemplate">
-      <OutputSubPath>Windows\Xamarin</OutputSubPath>
+      <OutputSubPath>Windows\Xamarin AOT</OutputSubPath>
     </VSTemplate>
   </ItemGroup>
   <ItemGroup>
