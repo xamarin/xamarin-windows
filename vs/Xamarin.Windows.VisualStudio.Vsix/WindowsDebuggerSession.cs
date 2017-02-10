@@ -21,8 +21,8 @@ namespace Xamarin.Windows
             UseOperationThread = true;
 
             var exeName = GetOutputAssembly(((Mono.Debugging.VisualStudio.StartInfo)startInfo).StartupProject);
-            var monoDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Mono", "bin");
-            monoDirectory = "C:\\x\\xw\\external\\mono\\msvc\\build\\sgen\\x64\\bin\\Release";
+            var monoDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"MSBuild\Xamarin\Windows\x64\Release");
+            var monoPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"Reference Assemblies\Microsoft\Framework\Xamarin.Windows\v1.0");
 
             var args = ((Mono.Debugging.VisualStudio.StartInfo)startInfo).StartArgs as SoftDebuggerListenArgs;
 
@@ -30,7 +30,7 @@ namespace Xamarin.Windows
             process.StartInfo = new System.Diagnostics.ProcessStartInfo(Path.Combine(monoDirectory, "mono-sgen.exe"), string.Format("--debug --debugger-agent=transport=dt_socket,address=127.0.0.1:{0} {1}", args.DebugPort, exeName));
             process.StartInfo.WorkingDirectory = monoDirectory;
             process.StartInfo.UseShellExecute = false;
-            process.StartInfo.EnvironmentVariables["MONO_PATH"] = @"C:\x\xw\external\mono\mcs\class\lib\net_4_x";
+            process.StartInfo.EnvironmentVariables["MONO_PATH"] = monoPath;
             process.Start();
         }
 
