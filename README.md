@@ -76,6 +76,8 @@ it.
 
 # Usage
 
+**NOTE!** For now, Xamarin needs to be installed in Visual Studio. Make sure to enable that in the Visual Studio setup.
+
 Launch the Xamarin.Windows.VisualStudio.Vsix project from within VS. Look for
 the Xamarin Windows templates when creating new projects.
 
@@ -109,3 +111,4 @@ Then add the line
 ```
 
 to the first `<ProjectGroup>` section in the `.csproj` file.
+
