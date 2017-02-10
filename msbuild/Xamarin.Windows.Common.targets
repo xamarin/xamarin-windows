@@ -21,6 +21,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <UsingTask TaskName="Xamarin.Windows.Tasks.ResolveAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
   <UsingTask TaskName="Xamarin.Windows.Tasks.Aot" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+  <UsingTask TaskName="Xamarin.Windows.Tasks.ConvertDebuggingFiles" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
   <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateLauncher" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
   <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateBundledAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
 
@@ -103,6 +104,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </CleanDependsOn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <BuildDependsOn>
+      $(BuildDependsOn);
+      _ConvertPdbFiles;
+    </BuildDependsOn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(OutputType)' == 'Exe'">
     <BuildNativeDependsOn>
       Build;
@@ -146,6 +154,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         <Output TaskParameter="ResolvedPdbFiles" ItemName="ResolvedPdbFiles" />
         <Output TaskParameter="ResolvedMdbFiles" ItemName="ResolvedMdbFiles" />
     </ResolveAssemblies>
+  </Target>
+
+  <Target Name="_ConvertPdbFiles"
+      Inputs="@(ResolvedPdbFiles)"
+      Outputs="@(ResolvedPdbFiles->'%(RootDir)%(Directory)%(Filename).dll.mdb')"
+      DependsOnTargets="_ResolveAssemblies">
+    <ConvertDebuggingFiles Files="@(ResolvedPdbFiles)" />
   </Target>
 
   <Target Name="_AotCompileAssemblies" DependsOnTargets="_ResolveAssemblies">

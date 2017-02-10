@@ -133,11 +133,90 @@
     <Compile Include="..\..\external\linker\linker\Mono.Linker\XApiReader.cs">
       <Link>Linker\Mono.Linker\XApiReader.cs</Link>
     </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\BitAccess.cs">
+      <Link>Pdb2Mdb\BitAccess.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\BitSet.cs">
+      <Link>Pdb2Mdb\BitSet.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\CvInfo.cs">
+      <Link>Pdb2Mdb\CvInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\DataStream.cs">
+      <Link>Pdb2Mdb\DataStream.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\DbiDbgHdr.cs">
+      <Link>Pdb2Mdb\DbiDbgHdr.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\DbiHeader.cs">
+      <Link>Pdb2Mdb\DbiHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\DbiModuleInfo.cs">
+      <Link>Pdb2Mdb\DbiModuleInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\DbiSecCon.cs">
+      <Link>Pdb2Mdb\DbiSecCon.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\Driver.cs">
+      <Link>Pdb2Mdb\Driver.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\Interfaces.cs">
+      <Link>Pdb2Mdb\Interfaces.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\IntHashTable.cs">
+      <Link>Pdb2Mdb\IntHashTable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\MsfDirectory.cs">
+      <Link>Pdb2Mdb\MsfDirectory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbConstant.cs">
+      <Link>Pdb2Mdb\PdbConstant.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbDebugException.cs">
+      <Link>Pdb2Mdb\PdbDebugException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbException.cs">
+      <Link>Pdb2Mdb\PdbException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbFile.cs">
+      <Link>Pdb2Mdb\PdbFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbFileHeader.cs">
+      <Link>Pdb2Mdb\PdbFileHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbFunction.cs">
+      <Link>Pdb2Mdb\PdbFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbLine.cs">
+      <Link>Pdb2Mdb\PdbLine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbLines.cs">
+      <Link>Pdb2Mdb\PdbLines.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbReader.cs">
+      <Link>Pdb2Mdb\PdbReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbScope.cs">
+      <Link>Pdb2Mdb\PdbScope.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbSlot.cs">
+      <Link>Pdb2Mdb\PdbSlot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbSource.cs">
+      <Link>Pdb2Mdb\PdbSource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\PdbWriter.cs">
+      <Link>Pdb2Mdb\PdbWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\external\mono\mcs\tools\pdb2mdb\SourceLocationProvider.cs">
+      <Link>Pdb2Mdb\SourceLocationProvider.cs</Link>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tasks\ConvertDebuggingFiles.cs" />
     <Compile Include="Tasks\Aot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\GenerateBundledAssemblies.cs" />
@@ -165,6 +244,10 @@
     <ProjectReference Include="..\..\external\cecil\Mono.Cecil.csproj">
       <Project>{d68133bd-1e63-496e-9ede-4fbdbf77b486}</Project>
       <Name>Mono.Cecil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\external\cecil\symbols\mdb\Mono.Cecil.Mdb.csproj">
+      <Project>{8559dd7f-a16f-46d0-a05a-9139faeba8fd}</Project>
+      <Name>Mono.Cecil.Mdb</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

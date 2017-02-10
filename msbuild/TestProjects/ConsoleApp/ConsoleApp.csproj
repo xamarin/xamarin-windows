@@ -61,6 +61,7 @@
   </PropertyGroup>
   <Target Name="ResolveAssembliesTest" DependsOnTargets="Clean;Build;_ResolveAssemblies" />
   <Target Name="AotTest" DependsOnTargets="Clean;Build;_AotCompileAssemblies" />
+  <Target Name="ConvertPdbFilesTest" DependsOnTargets="Clean;Build;_ConvertPdbFiles" />
   <Target Name="GenerateLauncherTest" DependsOnTargets="Clean;Build;_GenerateLauncher" />
   <Target Name="GenerateBundledAssembliesTest" DependsOnTargets="Clean;Build;_GenerateBundledAssemblies" />
   <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_CreateNativeWindowsExecutable" />

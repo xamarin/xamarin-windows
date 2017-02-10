@@ -42,6 +42,7 @@
     <Copy SourceFiles="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
     <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Xamarin.Windows.Build.Tasks.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
     <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Mono.Cecil.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Mono.Cecil.Mdb.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
 
   </Target>
 

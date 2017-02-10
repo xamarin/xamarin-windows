@@ -27,7 +27,8 @@ namespace Xamarin.Windows.Build.Tests
 		private static readonly string IntermediateOutputPath = Path.Combine("obj", "Debug", "XW");
 		private static readonly string AotOutputDirectory = Path.Combine(IntermediateOutputPath, "Aot");
 		private static readonly string GeneratedCodeOutputDirectory = Path.Combine(IntermediateOutputPath, "Gen");
-		private static readonly string NativeExeOutputDirectory = Path.Combine("bin", "Debug", "Native");
+		private static readonly string OutputDirectory = Path.Combine("bin", "Debug");
+		private static readonly string NativeExeOutputDirectory = Path.Combine(OutputDirectory, "Native");
 
 		private void ResolveAssemblies(string prefix, object properties = null)
 		{
@@ -91,6 +92,18 @@ namespace Xamarin.Windows.Build.Tests
 			var actualGeneratedAotFiles = GetPathItems(result, "GeneratedAotFiles");
 			var expectedGeneratedAotFiles = expectedAsmFiles.Select(f => Path.Combine(AotOutputDirectory, f));
 			CollectionAssert.AreEquivalent(expectedGeneratedAotFiles, actualGeneratedAotFiles);
+		}
+
+		[Test]
+		public void ConvertPdbFiles()
+		{
+			var result = BuildProject("ConsoleApp", targets: "ConvertPdbFilesTest", properties: new { MonoDevRoot });
+			var actualMdbFiles = Directory.GetFiles(TestProjectsRoot, "*.mdb", SearchOption.AllDirectories).OrderBy(s => s);
+			var expectedMdbFiles = new[] {
+				Path.Combine(GetTestProjectDir("ConsoleApp"), OutputDirectory, "ConsoleApp.exe.mdb"),
+				Path.Combine(GetTestProjectDir("ClassLibrary"), OutputDirectory, "ClassLibrary.dll.mdb")
+			};
+			CollectionAssert.AreEquivalent(expectedMdbFiles, actualMdbFiles);
 		}
 
 		[Test]
