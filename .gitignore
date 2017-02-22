@@ -1,5 +1,5 @@
 *.userprefs
-Configuration.Override.props
+*.Override.props
 Configuration.OperatingSystem.props
 msfinal.pub
 packages/

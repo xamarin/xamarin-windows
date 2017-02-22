@@ -4,6 +4,3 @@
 [submodule "external/linker"]
 	path = external/linker
 	url = https://github.com/mono/linker.git
-[submodule "external/mono"]
-	path = external/mono
-	url = https://github.com/mono/mono.git

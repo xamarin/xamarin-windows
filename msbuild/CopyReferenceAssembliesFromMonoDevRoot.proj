@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <Import Project="$(MSBuildThisFileDirectory)..\Xamarin.Windows.props"/>
+
   <PropertyGroup>
+    <TargetFrameworkName Condition="'$(TargetFrameworkName)' == ''">Xamarin.Windows</TargetFrameworkName>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v1.0</TargetFrameworkVersion>
     <ReferenceAssembliesPath Condition="'$(ReferenceAssembliesPath)' == ''">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework</ReferenceAssembliesPath>  
-    <XamarinWindowsTargetPath>$(ReferenceAssembliesPath)\Xamarin.Windows\v1.0</XamarinWindowsTargetPath>
-    <BclProfile>winaot</BclProfile>
+    <BclProfile Condition="'$(BclProfile)' == ''">winaot</BclProfile>
+    <FrameworkListFilePath Condition="'$(FrameworkListFilePath)' == ''">$(MSBuildThisFileDirectory)\FrameworkList.xml</FrameworkListFilePath>
+    <_TargetPath>$(ReferenceAssembliesPath)\$(TargetFrameworkName)\$(TargetFrameworkVersion)</_TargetPath>
     <_BclSourcePath>$(MonoDevRoot)\mcs\class\lib\$(BclProfile)</_BclSourcePath>
   </PropertyGroup>  
 
-  <Target Name="Build">
-    <Error Text="The MonoDevRoot property must be set on the command line." Condition="'$(MonoDevRoot)' == ''"/>
+  <Target Name="Build" DependsOnTargets="ValidateMonoDevRoot">
     <Error Text="The BCL source directory '$(_BclSourcePath)' does not exist." Condition="!Exists('$(_BclSourcePath)')"/>
-    <RemoveDir Directories="$(XamarinWindowsTargetPath)" Condition="Exists('$(XamarinWindowsTargetPath)')"/>
+    <RemoveDir Directories="$(_TargetPath)" Condition="Exists('$(_TargetPath)')"/>
     <ItemGroup>
       <Assemblies Include="$(_BclSourcePath)\*.dll"/>
       <Assemblies Remove="$(_BclSourcePath)\*.dll.dll"/>
@@ -20,13 +24,13 @@
       <FacadeAssemblies Include="$(_BclSourcePath)\Facades\*.dll"/>
     </ItemGroup> 
     <Copy SourceFiles="@(Assemblies)" 
-          DestinationFiles="@(Assemblies->'$(XamarinWindowsTargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+          DestinationFiles="@(Assemblies->'$(_TargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
     <Copy SourceFiles="@(PDBs)" 
-          DestinationFiles="@(PDBs->'$(XamarinWindowsTargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+          DestinationFiles="@(PDBs->'$(_TargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
     <Copy SourceFiles="@(FacadeAssemblies)" 
-          DestinationFiles="@(FacadeAssemblies->'$(XamarinWindowsTargetPath)\Facades\%(RecursiveDir)%(Filename)%(Extension)')"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)\FrameworkList.xml" 
-          DestinationFolder="$(XamarinWindowsTargetPath)\RedistList"/>
+          DestinationFiles="@(FacadeAssemblies->'$(_TargetPath)\Facades\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="$(FrameworkListFilePath)" 
+          DestinationFolder="$(_TargetPath)\RedistList"/>
   </Target>
 
 </Project>

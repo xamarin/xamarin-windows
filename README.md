@@ -32,10 +32,20 @@ cd xw/
 git submodule update --init --recursive
 ```
 
-## Build `external/mono`
+## Build the mono winaot BCL profile
 
+By default a mono checkout is expected in `mono/external`. Create a
+`Xamarin.Windows.Override.props` file in the root of the `xamarin-windows`
+checkout with a `MonoDevRoot` property to override the path to the mono
+checkout.
+
+**NOTE: A specific mono commit is expected to be checked out. Check the
+**`MonoCommit` property in the `Xamarin.Windows.props` file.
+
+Run from within cygwin:
 ```bash
-cd external/mono/
+cd path/to/mono
+git checkout <commit>
 ./autogen.sh --host=x86_64-w64-mingw32 --disable-boehm --with-runtime_preset=winaot
 export MONO_EXECUTABLE="`cygpath -u -a msvc\\\build\\\sgen\\\x64\\\bin\\\Release\\\mono-sgen.exe`"
 export VC_ROOT="/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
@@ -52,7 +62,7 @@ You may have to close VS before running this command.
 Run the following in an Administrator `cmd.exe`:
 ```
 cd C:\xw
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /p:MonoDevRoot=%cd%\external\mono msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
 ```
 
 ## Create the MSBuild toolchain
@@ -63,7 +73,7 @@ installed under `C:\Program Files (x86)\MSBuild\Xamarin\Windows`.
 Run the following in an Administrator `cmd.exe`:
 ```
 cd C:\xw
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /p:MonoDevRoot=%cd%\external\mono msbuild\CreateToolchain.proj
+"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" msbuild\CreateToolchain.proj
 ```
 
 This step has to be repeated whenever you change the MSBuild files or tasks
