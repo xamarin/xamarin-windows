@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="$(MSBuildThisFileDirectory)Xamarin.Windows.Override.props"
-      Condition="Exists('$(MSBuildThisFileDirectory)Xamarin.Windows.Override.props')"/>
+  <PropertyGroup>
+    <PropsFileName>Xamarin.Windows.props</PropsFileName>
+    <PropsOverrideFileName>Xamarin.Windows.Override.props</PropsOverrideFileName>
+    <ParentPropsFileDir>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory).., $(PropsFileName)))</ParentPropsFileDir>
+  </PropertyGroup>
+
+  <Import Project="$(ParentPropsFileDir)\$(PropsFileName)" Condition=" '$(ParentPropsFileDir)' != '' " />  
+  <Import Project="$(MSBuildThisFileDirectory)$(PropsOverrideFileName)" Condition="Exists('$(MSBuildThisFileDirectory)$(PropsOverrideFileName)')"/>
 
   <PropertyGroup>
-    <DefaultMonoDevRoot>$(MSBuildThisFileDirectory)external\mono</DefaultMonoDevRoot>
+    <MonoDevRoot Condition="'$(MonoDevRoot)' == ''">$(MSBuildThisFileDirectory)external\mono</MonoDevRoot>
     <CygwinPath Condition="'$(CygwinPath)' == ''">C:\cygwin</CygwinPath>
     <GitExePath Condition="'$(GitExePath)' == ''">$(CygwinPath)\bin\git.exe</GitExePath>
-    <MonoDevRoot Condition="'$(MonoDevRoot)' == ''">$([System.IO.Path]::GetFullPath ('$(DefaultMonoDevRoot)'))</MonoDevRoot>
-    <MonoCommit>1894134817926e7cf4e1a5c9f706feec001ce989</MonoCommit>
+    <MonoDevRoot>$([System.IO.Path]::GetFullPath ('$(MonoDevRoot)'))</MonoDevRoot>
+    <MonoCommit Condition="'$(MonoCommit)' == ''">1894134817926e7cf4e1a5c9f706feec001ce989</MonoCommit>
   </PropertyGroup>
 
   <Target Name="ValidateMonoDevRoot" BeforeTargets="CoreCompile">
