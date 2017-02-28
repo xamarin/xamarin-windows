@@ -32,7 +32,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
     <OutputPath>bin\Test\</OutputPath>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)..\..\Xamarin.Windows.props"/>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\Xamarin.Windows.props" />
   <ItemGroup>
     <Reference Include="Microsoft.Build, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Build.14.3.0\lib\net45\Microsoft.Build.dll</HintPath>
@@ -228,15 +228,15 @@
     <Compile Include="Utilities\Symbols.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\CreateNativeWindowsExecutable.vcxproj">
+      <Link>CreateNativeWindowsExecutable.vcxproj</Link>
+    </None>
     <None Include="..\Xamarin.Windows.Common.targets">
       <Link>Xamarin.Windows.Common.targets</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\Xamarin.Windows.CSharp.targets">
       <Link>Xamarin.Windows.CSharp.targets</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="CreateNativeWindowsExecutable.vcxproj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
