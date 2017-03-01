@@ -47,7 +47,9 @@ namespace Xamarin.Windows.Tasks
         {
             try
             {
-                
+                if (!Directory.Exists(Path.GetDirectoryName(Output))) {
+                    Directory.CreateDirectory(Path.GetDirectoryName(Output));
+                }
                 if (!File.Exists(Output) || new FileInfo(Output).Length == 0)
                 {
                     using (XmlWriter writer = XmlWriter.Create(Output))
