@@ -51,6 +51,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="xmlunit-core, Version=2.3.0.96, Culture=neutral, PublicKeyToken=e7d7e3088fd452f6, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\XMLUnit.Core.2.3.0\lib\net35\xmlunit-core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TargetTests.cs" />

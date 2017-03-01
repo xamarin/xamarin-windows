@@ -65,6 +65,22 @@
   <Target Name="GenerateLauncherTest" DependsOnTargets="Clean;Build;_GenerateLauncher" />
   <Target Name="GenerateBundledAssembliesTest" DependsOnTargets="Clean;Build;_GenerateBundledAssemblies" />
   <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_CreateNativeWindowsExecutable" />
+
+  <Target Name="ExtractItemsTest">
+    <ItemGroup>
+      <ClCompile Include="Main.cpp" />
+      <ClCompile Include="Game.cpp" />
+      <ClCompile Include="pch.cpp">
+        <PrecompiledHeader Condition="'$(TestVariable)' != ''">NotEmpty</PrecompiledHeader>
+        <PrecompiledHeader Condition="'$(TestVariable)' == ''">Empty</PrecompiledHeader>
+      </ClCompile>
+    </ItemGroup>
+    <ItemGroup>
+      <AppxManifest Include="Package.appxmanifest" />
+    </ItemGroup>
+    <ExtractItems Items="@(ClCompile)" ItemType="ClCompile" Output="$(ExtractItemsOutputFile)"/>
+    <ExtractItems Items="@(AppxManifest)" ItemType="AppxManifest" Output="$(ExtractItemsOutputFile)"/>
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

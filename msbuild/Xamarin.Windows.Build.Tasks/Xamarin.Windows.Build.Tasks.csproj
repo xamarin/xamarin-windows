@@ -220,6 +220,7 @@
     <Compile Include="Tasks\ConvertDebuggingFiles.cs" />
     <Compile Include="Tasks\Aot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\ExtractItems.cs" />
     <Compile Include="Tasks\GenerateBundledAssemblies.cs" />
     <Compile Include="Tasks\GenerateLauncher.cs" />
     <Compile Include="Tasks\ResolveAssemblies.cs" />

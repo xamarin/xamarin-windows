@@ -24,6 +24,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="Xamarin.Windows.Tasks.ConvertDebuggingFiles" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
   <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateLauncher" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
   <UsingTask TaskName="Xamarin.Windows.Tasks.GenerateBundledAssemblies" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
+  <UsingTask TaskName="Xamarin.Windows.Tasks.ExtractItems" AssemblyFile="$(XamarinWindowsBuildTasksPath)Xamarin.Windows.Build.Tasks.dll"/>
 
   <!--
   *******************************************

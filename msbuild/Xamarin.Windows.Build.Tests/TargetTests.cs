@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Org.XmlUnit.Builder;
+using Org.XmlUnit.Diff;
 
 namespace Xamarin.Windows.Build.Tests
 {
@@ -165,5 +167,60 @@ namespace Xamarin.Windows.Build.Tests
 			StringAssert.AreEqualIgnoringCase($"Hello from {exe}!\r\nHello from ClassLibrary!\r\n", output.ToString());
 		}
 
-	}
+        [Test]
+        public void ExtractItems()
+        {
+            var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), NativeExeOutputDirectory);
+            var exe = Path.Combine(outputDir, "ConsoleApp.exe");
+
+            var fileName = Path.GetTempFileName();
+            Console.WriteLine("Using temp file: " + fileName);
+            
+            var result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName });
+            
+            string expected = "<Project xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">"
+                                 + "<ItemGroup>"
+                                 +   "<ClCompile Include=\"Main.cpp\"/>"
+                                 +   "<ClCompile Include=\"Game.cpp\"/>"
+                                 +   "<ClCompile Include=\"pch.cpp\">"
+                                 +     "<PrecompiledHeader>Empty</PrecompiledHeader>"
+                                 +   "</ClCompile>"
+                                 + "</ItemGroup>"
+                                 + "<ItemGroup>"
+                                 +   "<AppxManifest Include=\"Package.appxmanifest\"/>"
+                                 + "</ItemGroup>"
+                               + "</Project>";
+
+            Diff diff = DiffBuilder.Compare(Input.FromFile(fileName))
+                                .WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
+                                .WithTest(Input.FromString(expected))
+                                .Build();
+            Assert.IsFalse(diff.HasDifferences(), diff.ToString());
+
+            fileName = Path.GetTempFileName();
+            Console.WriteLine("Using temp file: " + fileName);
+            expected = "<Project xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">"
+                                 + "<ItemGroup>"
+                                 + "<ClCompile Include=\"Main.cpp\"/>"
+                                 + "<ClCompile Include=\"Game.cpp\"/>"
+                                 + "<ClCompile Include=\"pch.cpp\">"
+                                 + "<PrecompiledHeader>NotEmpty</PrecompiledHeader>"
+                                 + "</ClCompile>"
+                                 + "</ItemGroup>"
+                                 + "<ItemGroup>"
+                                 + "<AppxManifest Include=\"Package.appxmanifest\"/>"
+                                 + "</ItemGroup>"
+                               + "</Project>";
+            result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName, TestVariable = "Something" });
+            diff = DiffBuilder.Compare(Input.FromFile(fileName))
+                                .WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
+                                .WithTest(Input.FromString(expected))
+                                .Build();
+
+            Assert.IsFalse(diff.HasDifferences(), diff.ToString());
+
+
+
+        }
+    }
 }
