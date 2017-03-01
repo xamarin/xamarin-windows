@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Items1 Include="$(TestProjects)\ConsoleApp\a.foo" />
+    <Items1 Include="$(TestProjects)\ConsoleApp\b.foo" />
+  </ItemGroup>
+  <ItemGroup>
+    <Items2 Include="$(TestProjects)\ConsoleApp\a.foo">
+      <SomeMetadata>DefaultValue</SomeMetadata>
+    </Items2>
+    <Items2 Include="$(TestProjects)\ConsoleApp\b.foo">
+      <SomeMetadata>DefaultValue</SomeMetadata>
+    </Items2>
+    <Items2 Include="$(TestProjects)\ConsoleApp\dir\c.foo">
+      <Link>dir\c.foo</Link>
+      <SomeMetadata>DefaultValue</SomeMetadata>
+    </Items2>
+    <Items2 Include="$(TestProjects)\ConsoleApp\dir\d.bar">
+      <Link>dir\d.bar</Link>
+      <SomeMetadata>ExplicitValue</SomeMetadata>
+    </Items2>
+  </ItemGroup>
+  <ItemGroup>
+    <Items3 Include="$(TestProjects)\ConsoleApp\foo.txt" />
+    <Items3 Include="$(TestProjects)\ConsoleApp\foo\bar.txt">
+      <CopyTo>foo\bar.txt</CopyTo>
+    </Items3>
+    <Items3 Include="c:\bar.foo" />
+  </ItemGroup>
+  <ItemGroup>
+    <Items4 Include="$(TestProjects)\ConsoleApp\yada.txt">
+      <Link>assets\foobar.txt</Link>
+      <OtherMetadata>NotEmpty</OtherMetadata>
+    </Items4>
+  </ItemGroup>
+</Project>

@@ -29,7 +29,7 @@ namespace Xamarin.Windows.Tasks
     /// 
     /// </summary>
     public class ExtractItems : Task, ICancelableTask
-	{
+    {
         static readonly string MSBuildNamespace = "http://schemas.microsoft.com/developer/msbuild/2003";
 
         [Required]
@@ -40,6 +40,8 @@ namespace Xamarin.Windows.Tasks
 
         [Required]
         public string Output { get; set; }
+
+        public string LinkMetadataName { get; set; }
 
         public override bool Execute()
         {
@@ -64,29 +66,50 @@ namespace Xamarin.Windows.Tasks
                 XmlElement group = doc.CreateElement("ItemGroup", MSBuildNamespace);
                 root.AppendChild(group);
 
-                foreach (ITaskItem item in Items)
+                if (string.IsNullOrEmpty(LinkMetadataName))
                 {
-                    XmlElement itemElement = doc.CreateElement(ItemType, MSBuildNamespace);
-                    XmlAttribute a = doc.CreateAttribute("Include");
-                    a.Value = item.ItemSpec;
-                    itemElement.Attributes.Append(a);
-                    IDictionary customMetadata = item.CloneCustomMetadata();
-                    
-                    foreach (string name in customMetadata.Keys)
-                    {
-                        XmlElement md = doc.CreateElement(name, MSBuildNamespace);
-                        md.InnerText = item.GetMetadata(name);
-                        itemElement.AppendChild(md);
-                    }
-                    group.AppendChild(itemElement);
+                    LinkMetadataName = "Link";
                 }
-
-                doc.Save(Output);
 
                 Log.LogDebugMessage("ExtractItems Task");
                 Log.LogDebugMessage("  ItemType: " + ItemType);
                 Log.LogDebugMessage("  Output: " + Output);
-                Log.LogDebugTaskItems("  Items:", Items);
+                Log.LogDebugMessage("  LinkMetadataName: " + LinkMetadataName);
+                Log.LogDebugMessage("  Items:");
+
+                foreach (ITaskItem item in Items)
+                {
+                    var absoluteInclude = Path.GetFullPath(item.ItemSpec);
+                    Log.LogDebugMessage($"    <{ItemType} Include=\"{absoluteInclude}\">");
+                    XmlElement itemElement = doc.CreateElement(ItemType, MSBuildNamespace);
+                    XmlAttribute a = doc.CreateAttribute("Include");
+                    a.Value = absoluteInclude;
+                    itemElement.Attributes.Append(a);
+                    IDictionary customMetadata = item.CloneCustomMetadata();
+
+                    var currDir = Canonicalize(Environment.CurrentDirectory);
+                    if (!Path.IsPathRooted(item.ItemSpec) 
+                        && Canonicalize(Path.GetDirectoryName(Path.GetFullPath(item.ItemSpec))).ToLowerInvariant() != currDir.ToLowerInvariant() 
+                        && !customMetadata.Contains(LinkMetadataName)) {
+
+                        var md = doc.CreateElement(LinkMetadataName, MSBuildNamespace);
+                        md.InnerText = item.ItemSpec;
+                        itemElement.AppendChild(md);
+                        Log.LogDebugMessage($"      <{LinkMetadataName}>{item.ItemSpec}</{LinkMetadataName}>");
+                    }
+                    foreach (string name in customMetadata.Keys)
+                    {
+                        var value = item.GetMetadata(name);
+                        Log.LogDebugMessage($"      <{name}>{value}</{name}>");
+                        XmlElement md = doc.CreateElement(name, MSBuildNamespace);
+                        md.InnerText = value;
+                        itemElement.AppendChild(md);
+                    }
+                    group.AppendChild(itemElement);
+                    Log.LogDebugMessage($"    </{ItemType}>");
+                }
+
+                doc.Save(Output);
 
                 return true;
             }
@@ -95,6 +118,11 @@ namespace Xamarin.Windows.Tasks
                 Log.LogError("{0}", e);
                 return false;
             }
+        }
+
+        static string Canonicalize(string path)
+        {
+            return new Uri(path).LocalPath;
         }
 
         public void Cancel()

@@ -66,20 +66,30 @@
   <Target Name="GenerateBundledAssembliesTest" DependsOnTargets="Clean;Build;_GenerateBundledAssemblies" />
   <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_CreateNativeWindowsExecutable" />
 
+  <ItemDefinitionGroup>
+    <Items2>
+      <SomeMetadata>DefaultValue</SomeMetadata>
+    </Items2>
+  </ItemDefinitionGroup>
+
   <Target Name="ExtractItemsTest">
     <ItemGroup>
-      <ClCompile Include="Main.cpp" />
-      <ClCompile Include="Game.cpp" />
-      <ClCompile Include="pch.cpp">
-        <PrecompiledHeader Condition="'$(TestVariable)' != ''">NotEmpty</PrecompiledHeader>
-        <PrecompiledHeader Condition="'$(TestVariable)' == ''">Empty</PrecompiledHeader>
-      </ClCompile>
+      <Items1 Include="*.foo"/>
+      <Items2 Include="**\*.foo"/>
+      <Items2 Include="**\*.bar">
+        <SomeMetadata>ExplicitValue</SomeMetadata>
+      </Items2>
+      <Items3 Include="foo.txt;foo\bar.txt;c:\bar.foo"/>
+      <Items4 Include="yada.txt">
+        <Link>assets\foobar.txt</Link>
+        <OtherMetadata Condition="'$(TestVariable)' != ''">NotEmpty</OtherMetadata>
+        <OtherMetadata Condition="'$(TestVariable)' == ''">Empty</OtherMetadata>
+      </Items4>
     </ItemGroup>
-    <ItemGroup>
-      <AppxManifest Include="Package.appxmanifest" />
-    </ItemGroup>
-    <ExtractItems Items="@(ClCompile)" ItemType="ClCompile" Output="$(ExtractItemsOutputFile)"/>
-    <ExtractItems Items="@(AppxManifest)" ItemType="AppxManifest" Output="$(ExtractItemsOutputFile)"/>
+    <ExtractItems Items="@(Items1)" ItemType="Items1" Output="$(ExtractItemsOutputFile)"/>
+    <ExtractItems Items="@(Items2)" ItemType="Items2" Output="$(ExtractItemsOutputFile)"/>
+    <ExtractItems Items="@(Items3)" ItemType="Items3" Output="$(ExtractItemsOutputFile)" LinkMetadataName="CopyTo"/>
+    <ExtractItems Items="@(Items4)" ItemType="Items4" Output="$(ExtractItemsOutputFile)"/>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
