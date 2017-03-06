@@ -29,6 +29,7 @@ namespace Xamarin.Windows.Tasks
 		public string NativeToolsPrefix { get; set; }
 		public string NativeLinkerFlags { get; set; }
 		public bool IsDebug { get; set; }
+		public bool OnlyRecompileIfChanged { get; set; }
 		public bool GenerateNativeDebugInfo { get; set; }
 		private AotFileType outputFileType { get; set; } = AotFileType.Obj;
 		public string OutputFileType {
@@ -98,6 +99,7 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugMessage("  PreAdditionalAotArguments: {0}", PreAdditionalAotArguments);
 			Log.LogDebugMessage("  PostAdditionalAotArguments: {0}", PostAdditionalAotArguments);
 			Log.LogDebugMessage("  IsDebug: {0}", IsDebug);
+			Log.LogDebugMessage("  OnlyRecompileIfChanged: {0}", OnlyRecompileIfChanged);
 			Log.LogDebugMessage("  GenerateNativeDebugInfo: {0}", GenerateNativeDebugInfo);
 			Log.LogDebugMessage("  OutputFileType: {0}", OutputFileType);
 			Log.LogDebugMessage("  OutputFileExtension: {0}", OutputFileExtension);
@@ -125,6 +127,13 @@ namespace Xamarin.Windows.Tasks
 
 				var outputFile = Path.Combine(AotOutputDirectory, Path.GetFileName(assembly.ItemSpec) + "." + OutputFileExtension);
 				outputFiles.Add(outputFile);
+				var assemblyPath = Path.GetFullPath(assembly.ItemSpec);
+				if (OnlyRecompileIfChanged && File.Exists(outputFile) && File.Exists(assemblyPath) 
+						&& File.GetLastWriteTime(outputFile) >= File.GetLastWriteTime(assemblyPath)) {
+					Log.LogDebugMessage("  Not recompiling unchanged assembly: {0}", assemblyPath);
+					continue;
+				}
+
 				var tempDir = Path.Combine(AotOutputDirectory, Path.GetFileName(assembly.ItemSpec) + ".tmp");
 				if (!Directory.Exists(tempDir))
 					Directory.CreateDirectory(tempDir);
@@ -158,7 +167,6 @@ namespace Xamarin.Windows.Tasks
 
 				string aotOptionsStr = "--aot=" + string.Join(",", aotOptions);
 
-				var assemblyPath = Path.GetFullPath(assembly.ItemSpec);
 				if (!RunAotCompiler(AotCompilerPath, aotOptionsStr, assembliesPath, assemblyPath)) {
 					Log.LogCodedError("XW3001", "Could not AOT compile the assembly: {0}", assemblyPath);
 					return false;
