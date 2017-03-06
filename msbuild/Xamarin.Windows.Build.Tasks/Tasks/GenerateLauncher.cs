@@ -20,6 +20,8 @@ namespace Xamarin.Windows.Tasks
 		[Required]
 		public string OutputDirectory { get; set; }
 
+		public string LauncherTemplatePath { get; set; }
+
 		public string LauncherFileName { get; set; }
 
 		public bool UseCustomPlatformImpl { get; set; }
@@ -50,10 +52,13 @@ namespace Xamarin.Windows.Tasks
 			if (string.IsNullOrEmpty(LauncherFileName)) {
 				LauncherFileName = "launcher.c";
 			}
+			AotAssemblies = AotAssemblies ?? new ITaskItem[0];
+			BundledAssemblies = BundledAssemblies ?? new ITaskItem[0];
 
 			Log.LogDebugMessage("GenerateLauncher Task");
 			Log.LogDebugMessage("  OutputDirectory: {0}", OutputDirectory);
 			Log.LogDebugMessage("  MainAssemblyName: {0}", MainAssemblyName);
+			Log.LogDebugMessage("  LauncherTemplatePath: {0}", LauncherTemplatePath);
 			Log.LogDebugMessage("  LauncherFileName: {0}", LauncherFileName);
 			Log.LogDebugMessage("  UseCustomPlatformImpl: {0}", UseCustomPlatformImpl);
 			Log.LogDebugTaskItems("  AotAssemblies:", AotAssemblies);
@@ -80,7 +85,7 @@ namespace Xamarin.Windows.Tasks
 			}).ToList();
 
 			var nl = Environment.NewLine;
-			var launcher = Resources.LauncherTemplate;
+			var launcher = string.IsNullOrEmpty(LauncherTemplatePath) ? Resources.LauncherTemplate : File.ReadAllText(LauncherTemplatePath);
 
 			var aotModules = new StringBuilder()
 				.AppendLine("BEGIN_DECLARE_AOT_MODULES")
@@ -137,19 +142,30 @@ namespace Xamarin.Windows.Tasks
 			}
 			var outputFiles = new List<string>();
 			var outputFile = Path.Combine(OutputDirectory, LauncherFileName);
-			File.WriteAllText(outputFile, launcher);
+			var writeOutputFile = true;
+			if (File.Exists(outputFile)) {
+				var oldContents = File.ReadAllText(outputFile);
+				writeOutputFile = oldContents != launcher;
+			}
+			if (writeOutputFile) {
+				File.WriteAllText(outputFile, launcher);
+			} else {
+				Log.LogDebugMessage("  Output file {0} hasn't changed. Won't overwrite.", outputFile);
+			}
 			outputFiles.Add(outputFile);
 
-			// Copy the bundled platform.h
-			var platformHeaderFile = Path.Combine(OutputDirectory, "platform.h");
-			File.WriteAllText(platformHeaderFile, Resources.PlatformHeader);
-			outputFiles.Add(platformHeaderFile);
+			if (string.IsNullOrEmpty(LauncherTemplatePath)) {
+				// Copy the bundled platform.h
+				var platformHeaderFile = Path.Combine(OutputDirectory, "platform.h");
+				File.WriteAllText(platformHeaderFile, Resources.PlatformHeader);
+				outputFiles.Add(platformHeaderFile);
 
-			if (!UseCustomPlatformImpl) {
-				// Use the bundled platform.c
-				var platformImplFile = Path.Combine(OutputDirectory, "platform.c");
-				File.WriteAllText(platformImplFile, Resources.PlatformImpl);
-				outputFiles.Add(platformImplFile);
+				if (!UseCustomPlatformImpl) {
+					// Use the bundled platform.c
+					var platformImplFile = Path.Combine(OutputDirectory, "platform.c");
+					File.WriteAllText(platformImplFile, Resources.PlatformImpl);
+					outputFiles.Add(platformImplFile);
+				}
 			}
 
 			GeneratedFiles = outputFiles.Select(f => new TaskItem(f)).ToArray();
