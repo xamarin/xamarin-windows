@@ -17,11 +17,19 @@ namespace Xamarin.Windows.Tasks
 		[Required]
 		public ITaskItem[] Files { get; set; }
 
+		[Output]
+		public ITaskItem[] MdbFiles { get; set; }
+
+		[Output]
+		public ITaskItem[] PPdbFiles { get; set; }
+
 		public override bool Execute()
 		{
 			Log.LogDebugMessage("ConvertDebuggingFiles Task");
-			Log.LogDebugMessage("  InputFiles: {0}", Files);
+			Log.LogDebugMessage("  Files: {0}", Files);
 
+			var mdbs = new List<string>();
+			var ppdbs = new List<string>();
 			foreach (var file in Files) {
 				var pdb = file.ToString();
 
@@ -34,15 +42,26 @@ namespace Xamarin.Windows.Tasks
 					var assembly = Path.ChangeExtension(pdb, ".dll");
 					if (!File.Exists(assembly))
 						assembly = Path.ChangeExtension(pdb, ".exe");
-					Log.LogDebugMessage("  Converting file: {0} -> {1}.mdb", pdb, assembly);
-					//MonoAndroidHelper.SetWriteable(pdb);
-					Converter.Convert(assembly);
+					var mdb = assembly + ".mdb";
+					if (File.Exists(pdb) && File.Exists(mdb) && File.GetLastWriteTime(pdb) <= File.GetLastWriteTime(mdb)) {
+						Log.LogDebugMessage("  Not converting unchanged file: {0}", pdb);
+					} else {
+						Log.LogDebugMessage("  Trying to convert file: {0} -> {1}", pdb, mdb);
+						Converter.Convert(assembly);
+					}
+					mdbs.Add(mdb);
 				} catch (PortablePdbNotSupportedException) {
 					Log.LogDebugMessage("Not converting portable PDB: {0}", pdb);
+					ppdbs.Add(pdb);
 				} catch (Exception ex) {
 					Log.LogWarningFromException(ex, true);
 				}
 			}
+
+			MdbFiles = mdbs.Select(f => new TaskItem(f)).ToArray();
+			PPdbFiles = ppdbs.Select(f => new TaskItem(f)).ToArray();
+			Log.LogDebugTaskItems("  [Output] MdbFiles:", MdbFiles);
+			Log.LogDebugTaskItems("  [Output] PPdbFiles:", PPdbFiles);
 
 			return true;
 		}

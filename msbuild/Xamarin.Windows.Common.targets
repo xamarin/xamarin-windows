@@ -157,11 +157,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </ResolveAssemblies>
   </Target>
 
-  <Target Name="_ConvertPdbFiles"
-      Inputs="@(ResolvedPdbFiles)"
-      Outputs="@(ResolvedPdbFiles->'%(RootDir)%(Directory)%(Filename).dll.mdb')"
-      DependsOnTargets="_ResolveAssemblies">
-    <ConvertDebuggingFiles Files="@(ResolvedPdbFiles)" />
+  <Target Name="_ConvertPdbFiles" DependsOnTargets="_ResolveAssemblies">
+    <ConvertDebuggingFiles Files="@(ResolvedPdbFiles)">
+      <Output TaskParameter="MdbFiles" ItemName="MdbFiles" />
+      <Output TaskParameter="PPdbFiles" ItemName="PPdbFiles" />
+    </ConvertDebuggingFiles>
   </Target>
 
   <Target Name="_AotCompileAssemblies" DependsOnTargets="_ResolveAssemblies">

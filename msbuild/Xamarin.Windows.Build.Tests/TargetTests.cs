@@ -101,12 +101,13 @@ namespace Xamarin.Windows.Build.Tests
 		public void ConvertPdbFiles()
 		{
 			var result = BuildProject("ConsoleApp", targets: "ConvertPdbFilesTest", properties: new { MonoDevRoot });
-			var actualMdbFiles = Directory.GetFiles(TestProjectsRoot, "*.mdb", SearchOption.AllDirectories).OrderBy(s => s);
-			var expectedMdbFiles = new[] {
-				Path.Combine(GetTestProjectDir("ConsoleApp"), OutputDirectory, "ConsoleApp.exe.mdb"),
-				Path.Combine(GetTestProjectDir("ClassLibrary"), OutputDirectory, "ClassLibrary.dll.mdb")
-			};
+			var actualMdbFiles = Directory.GetFiles(TestProjectsRoot, "*.mdb", SearchOption.AllDirectories).OrderBy(s => s).Select(ReplaceRoots);
+			var expectedMdbFiles = ConsoleAppUserAssemblies.Select(f => f + ".mdb");
 			CollectionAssert.AreEquivalent(expectedMdbFiles, actualMdbFiles);
+			var outputMdbFiles = GetPathItems(result, "MdbFiles");
+			var outputPPdbFiles = GetPathItems(result, "PPdbFiles");
+			CollectionAssert.AreEquivalent(expectedMdbFiles, outputMdbFiles);
+			CollectionAssert.AreEquivalent(ConsoleAppFrameworkAssemblies.Select(f => Path.Combine("$(MonoDevBcl)", Path.ChangeExtension(f, ".pdb"))), outputPPdbFiles);
 		}
 
 		[Test]
@@ -168,38 +169,38 @@ namespace Xamarin.Windows.Build.Tests
 			StringAssert.AreEqualIgnoringCase($"Hello from {exe}!\r\nHello from ClassLibrary!\r\n", output.ToString());
 		}
 
-        [Test]
-        public void ExtractItems()
-        {
-            var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), NativeExeOutputDirectory);
-            var exe = Path.Combine(outputDir, "ConsoleApp.exe");
+		[Test]
+		public void ExtractItems()
+		{
+			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), NativeExeOutputDirectory);
+			var exe = Path.Combine(outputDir, "ConsoleApp.exe");
 
-            var fileName = Path.GetTempFileName();
-            Console.WriteLine("Using temp file: " + fileName);
-            
-            var result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName });
+			var fileName = Path.GetTempFileName();
+			Console.WriteLine("Using temp file: " + fileName);
+			
+			var result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName });
 
-            var expected1 = Resources.ExtractItemsTestExpected1.Replace("$(TestProjects)", TestProjectsRoot);
+			var expected1 = Resources.ExtractItemsTestExpected1.Replace("$(TestProjects)", TestProjectsRoot);
 
-            Diff diff = DiffBuilder.Compare(Input.FromFile(fileName))
-                                .WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
-                                .WithTest(Input.FromString(expected1))
-                                .Build();
-            Assert.IsFalse(diff.HasDifferences(), diff.ToString());
+			Diff diff = DiffBuilder.Compare(Input.FromFile(fileName))
+								.WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
+								.WithTest(Input.FromString(expected1))
+								.Build();
+			Assert.IsFalse(diff.HasDifferences(), diff.ToString());
 
-            fileName = Path.GetTempFileName();
-            Console.WriteLine("Using temp file: " + fileName);
-            var expected2 = Resources.ExtractItemsTestExpected2.Replace("$(TestProjects)", TestProjectsRoot);
-            result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName, TestVariable = "Something" });
-            diff = DiffBuilder.Compare(Input.FromFile(fileName))
-                                .WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
-                                .WithTest(Input.FromString(expected2))
-                                .Build();
+			fileName = Path.GetTempFileName();
+			Console.WriteLine("Using temp file: " + fileName);
+			var expected2 = Resources.ExtractItemsTestExpected2.Replace("$(TestProjects)", TestProjectsRoot);
+			result = BuildProject("ConsoleApp", targets: "ExtractItemsTest", properties: new { ExtractItemsOutputFile = fileName, TestVariable = "Something" });
+			diff = DiffBuilder.Compare(Input.FromFile(fileName))
+								.WithDifferenceEvaluator(DifferenceEvaluators.IgnorePrologDifferences())
+								.WithTest(Input.FromString(expected2))
+								.Build();
 
-            Assert.IsFalse(diff.HasDifferences(), diff.ToString());
+			Assert.IsFalse(diff.HasDifferences(), diff.ToString());
 
 
 
-        }
-    }
+		}
+	}
 }
