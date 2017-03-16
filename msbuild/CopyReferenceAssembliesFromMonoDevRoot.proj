@@ -19,6 +19,7 @@
     <ItemGroup>
       <Assemblies Include="$(_BclSourcePath)\*.dll"/>
       <Assemblies Remove="$(_BclSourcePath)\*.dll.dll"/>
+      <Assemblies Remove="$(_BclSourcePath)\*nunit*.*"/>
       <PDBCandidates Include="@(Assemblies->'$(_BclSourcePath)\%(Filename).pdb')"/>
       <PDBs Include="@(PDBCandidates)" Condition="Exists('%(Identity)')"/>
       <FacadeAssemblies Include="$(_BclSourcePath)\Facades\*.dll"/>
