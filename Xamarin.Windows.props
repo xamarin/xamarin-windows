@@ -15,7 +15,7 @@
     <CygwinPath Condition="'$(CygwinPath)' == ''">C:\cygwin</CygwinPath>
     <GitExePath Condition="'$(GitExePath)' == ''">$(CygwinPath)\bin\git.exe</GitExePath>
     <MonoDevRoot>$([System.IO.Path]::GetFullPath ('$(MonoDevRoot)'))</MonoDevRoot>
-    <MonoCommit Condition="'$(MonoCommit)' == ''">1894134817926e7cf4e1a5c9f706feec001ce989</MonoCommit>
+    <MonoCommit Condition="'$(MonoCommit)' == ''">1006d04ff640f9af73d7cdd1aa12d5fe6ae333ac</MonoCommit>
   </PropertyGroup>
 
   <Target Name="ValidateMonoDevRoot" BeforeTargets="CoreCompile">
