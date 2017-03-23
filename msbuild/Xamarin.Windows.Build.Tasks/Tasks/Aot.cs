@@ -106,6 +106,11 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugTaskItems("  ResolvedFrameworkAssemblies:", ResolvedFrameworkAssemblies);
 			Log.LogDebugTaskItems("  ResolvedUserAssemblies:", ResolvedUserAssemblies);
 
+			if (!File.Exists(Path.Combine(NativeToolchainPaths, "clang.exe"))) {
+				Log.LogError ($"Could not find clang.exe in {NativeToolchainPaths}. Please install clang using the Visual Studio Installer.");
+				return false;
+			}
+
 			var outputFiles = new List<string>();
 
 			// Calculate the MONO_PATH we'll use when invoking the AOT compiler. This is the concatenation
