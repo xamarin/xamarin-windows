@@ -107,7 +107,9 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugTaskItems("  ResolvedUserAssemblies:", ResolvedUserAssemblies);
 
 			if (!File.Exists(Path.Combine(NativeToolchainPaths, "clang.exe"))) {
-				Log.LogError ($"Could not find clang.exe in {NativeToolchainPaths}. Please install clang using the Visual Studio Installer.");
+				Log.LogError ($"Could not find clang.exe in {NativeToolchainPaths}. "
+							  + "Make sure to select the feature \"Clang with Microsoft Codegen\" in the Visual Studio Installer "
+							  + "under \"Cross Platform Mobile Development\"->\"Visual C++ Mobile Development\".");
 				return false;
 			}
 
