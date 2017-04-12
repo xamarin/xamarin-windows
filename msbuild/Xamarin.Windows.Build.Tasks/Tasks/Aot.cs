@@ -37,6 +37,7 @@ namespace Xamarin.Windows.Tasks
 			set { outputFileType = (AotFileType) Enum.Parse(typeof(AotFileType), value, true); }
 		}
 		public string OutputFileExtension { get; set; }
+		public string Runtime { get; set; }
 
 		[Required]
 		public ITaskItem[] ResolvedFrameworkAssemblies { get; set; }
@@ -44,7 +45,6 @@ namespace Xamarin.Windows.Tasks
 		[Required]
 		public ITaskItem[] ResolvedUserAssemblies { get; set; }
 
-		[Required]
 		public string AotCompilerBclPath { get; set; }
 
 		[Required]
@@ -99,6 +99,7 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugMessage("  PreAdditionalAotArguments: {0}", PreAdditionalAotArguments);
 			Log.LogDebugMessage("  PostAdditionalAotArguments: {0}", PostAdditionalAotArguments);
 			Log.LogDebugMessage("  IsDebug: {0}", IsDebug);
+			Log.LogDebugMessage("  Runtime: {0}", Runtime);
 			Log.LogDebugMessage("  OnlyRecompileIfChanged: {0}", OnlyRecompileIfChanged);
 			Log.LogDebugMessage("  GenerateNativeDebugInfo: {0}", GenerateNativeDebugInfo);
 			Log.LogDebugMessage("  OutputFileType: {0}", OutputFileType);
@@ -119,12 +120,13 @@ namespace Xamarin.Windows.Tasks
 			// of AotCompilerBclPath and the dir of each assembly we will compile.
 			var assembliesPath =
 				string.Join(";",
-					AotCompilerBclPath
+					(AotCompilerBclPath ?? "")
 						.Split(';').Where(p => !string.IsNullOrEmpty(p)).Select(p => Path.GetFullPath(p))
 						.Union(
 							ResolvedFrameworkAssemblies
 								.Union(ResolvedUserAssemblies)
 								.Select(a => Path.GetDirectoryName(Path.GetFullPath(a.ItemSpec))))
+						.Select(p => p.TrimEnd('\\', '/'))
 						.Distinct(StringComparer.CurrentCultureIgnoreCase));
 
 			foreach (var assembly in ResolvedFrameworkAssemblies.Union(ResolvedUserAssemblies)) {
@@ -172,9 +174,17 @@ namespace Xamarin.Windows.Tasks
 					aotOptions.Add(PostAdditionalAotArguments);
 				}
 
-				string aotOptionsStr = "--aot=" + string.Join(",", aotOptions);
+				var args = new List<string>();
+				if (IsDebug) {
+					args.Add("--debug");
+				}
+				if (!string.IsNullOrWhiteSpace(Runtime)) {
+					args.Add("--runtime=" + Runtime);
+				}
+				args.Add("--aot=" + string.Join(",", aotOptions));
+				args.Add('"' + assemblyPath + '"');
 
-				if (!RunAotCompiler(AotCompilerPath, aotOptionsStr, assembliesPath, assemblyPath)) {
+				if (!RunAotCompiler(AotCompilerPath, args, assembliesPath)) {
 					Log.LogCodedError("XW3001", "Could not AOT compile the assembly: {0}", assemblyPath);
 					return false;
 				}
@@ -186,11 +196,11 @@ namespace Xamarin.Windows.Tasks
 			return true;
 		}
 
-		bool RunAotCompiler(string aotCompiler, string aotOptions, string assembliesPath, string assembly)
+		bool RunAotCompiler(string aotCompiler, List<string> args, string assembliesPath)
 		{
 			var psi = new ProcessStartInfo() {
 				FileName = aotCompiler,
-				Arguments = (IsDebug ? "--debug " : "") + aotOptions + " \"" + assembly + "\"",
+				Arguments = string.Join(" ", args),
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
