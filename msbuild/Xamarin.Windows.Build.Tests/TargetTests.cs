@@ -100,14 +100,16 @@ namespace Xamarin.Windows.Build.Tests
 		[Test]
 		public void ConvertPdbFiles()
 		{
+			var projectDir = GetTestProjectDir("ConsoleApp");
+			var intermediateAssemDir = Path.Combine(projectDir, @"obj\Debug\XW\Assem");
 			var result = BuildProject("ConsoleApp", targets: "ConvertPdbFilesTest", properties: new { MonoDevRoot });
 			var actualMdbFiles = Directory.GetFiles(TestProjectsRoot, "*.mdb", SearchOption.AllDirectories).OrderBy(s => s).Select(ReplaceRoots);
-			var expectedMdbFiles = ConsoleAppUserAssemblies.Select(f => f + ".mdb");
+			var expectedMdbFiles = ConsoleAppUserAssemblies.Select(f => Path.Combine(intermediateAssemDir, Path.GetFileName(f) + ".mdb")).Select(ReplaceRoots);
 			CollectionAssert.AreEquivalent(expectedMdbFiles, actualMdbFiles);
-			var outputMdbFiles = GetPathItems(result, "MdbFiles");
-			var outputPPdbFiles = GetPathItems(result, "PPdbFiles");
+			var outputMdbFiles = GetPathItems(result, "ConvertedMdbFiles").Select(p => Path.Combine(projectDir, p)).Select(ReplaceRoots);
+			var outputPPdbFiles = GetPathItems(result, "CollectedPPdbFiles").Select(p => Path.Combine(projectDir, p)).Select(ReplaceRoots);
 			CollectionAssert.AreEquivalent(expectedMdbFiles, outputMdbFiles);
-			CollectionAssert.AreEquivalent(ConsoleAppFrameworkAssemblies.Select(f => Path.Combine("$(MonoDevBcl)", Path.ChangeExtension(f, ".pdb"))), outputPPdbFiles);
+			CollectionAssert.AreEquivalent(ConsoleAppFrameworkAssemblies.Select(f => Path.Combine(intermediateAssemDir, Path.ChangeExtension(f, ".pdb"))).Select(ReplaceRoots), outputPPdbFiles);
 		}
 
 		[Test]

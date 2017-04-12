@@ -47,7 +47,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <AotOutputFileExtension Condition="'$(AotOutputFileExtension)' == ''"></AotOutputFileExtension> <!-- Aot task defaults to .obj/.s/.dll depending on AotOutputFileType value -->
     <LauncherFileName Condition="'$(LauncherFileName)' == ''"></LauncherFileName> <!-- Use GenerateLauncher task's default -->
     <UseCustomPlatformImpl Condition="'$(UseCustomPlatformImpl)' == ''">False</UseCustomPlatformImpl>
-    <CreateNativeExecutableTarget Condition="'$(CreateNativeExecutableTarget)' == ''">_CreateNativeWindowsExecutable</CreateNativeExecutableTarget>
   </PropertyGroup>
 
   <!-- Allows to use the BCL and toolchain from a Mono dev root -->
@@ -68,6 +67,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <_XWIntermediateAssembliesDirectory>$(_XWIntermediateOutputPath)Assem\</_XWIntermediateAssembliesDirectory>
     <_XWIntermediateNativeOutputDirectory>$(_XWIntermediateOutputPath)Native\</_XWIntermediateNativeOutputDirectory>
     <_XWNativeExeOutputDirectory>$(OutputPath)Native\</_XWNativeExeOutputDirectory>
+    <_XWNativeProjectName>$(TargetName)</_XWNativeProjectName>
+    <_XWNativeProjectFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).vcxproj</_XWNativeProjectFile>
+    <_XWNativeProjectPropsFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).props</_XWNativeProjectPropsFile>
+    <_XWExtractedItemsFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).items</_XWExtractedItemsFile>
   </PropertyGroup>
 
   <!-- Toolchain setup -->
@@ -77,7 +80,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\mono-sgen.exe</AotCompilerPath>
     <VSInstall Condition="'$(VSInstall)' == ''">$([System.IO.Directory]::GetParent("$(VSSDK140Install)").Parent.FullName)\</VSInstall>
     <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == ''">$(VSInstall)VC\ClangC2\bin\amd64</NativeToolchainPaths>
-    <NativeCompilerConfiguration Condition="'$(NativeCompilerConfiguration)' == ''">Release</NativeCompilerConfiguration>
+    <NativeBuildConfiguration Condition="'$(NativeBuildConfiguration)' == ''">Release</NativeBuildConfiguration>
     <MonoLibsPath Condition="'$(MonoLibsPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\</MonoLibsPath>
   </PropertyGroup>
 
@@ -115,7 +118,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup Condition="'$(OutputType)' == 'Exe'">
     <BuildNativeDependsOn>
       Build;
-      $(CreateNativeExecutableTarget);
+      BuildNative;
     </BuildNativeDependsOn>
   </PropertyGroup>
 
@@ -157,17 +160,31 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </ResolveAssemblies>
   </Target>
 
-  <Target Name="_ConvertPdbFiles" DependsOnTargets="_ResolveAssemblies">
-    <ConvertDebuggingFiles Files="@(ResolvedPdbFiles)">
-      <Output TaskParameter="MdbFiles" ItemName="MdbFiles" />
-      <Output TaskParameter="PPdbFiles" ItemName="PPdbFiles" />
+  <Target Name="_CollectAssemblies" DependsOnTargets="_ResolveAssemblies">
+    <Copy SourceFiles="@(ResolvedAssemblies)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(ResolvedPdbFiles)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(ResolvedMdbFiles)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
+    <ItemGroup>
+      <CollectedUserAssemblies Include="@(ResolvedUserAssemblies -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
+      <CollectedFrameworkAssemblies Include="@(ResolvedFrameworkAssemblies -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
+      <CollectedPdbFiles Include="@(ResolvedPdbFiles -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
+      <CollectedMdbFiles Include="@(ResolvedMdbFiles -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
+      <CollectedAssemblies Include="@(CollectedUserAssemblies)"/>
+      <CollectedAssemblies Include="@(CollectedFrameworkAssemblies)"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_ConvertPdbFiles" DependsOnTargets="_CollectAssemblies">
+    <ConvertDebuggingFiles Files="@(CollectedPdbFiles)">
+      <Output TaskParameter="MdbFiles" ItemName="ConvertedMdbFiles" />
+      <Output TaskParameter="PPdbFiles" ItemName="CollectedPPdbFiles" />
     </ConvertDebuggingFiles>
   </Target>
 
-  <Target Name="_AotCompileAssemblies" DependsOnTargets="_ResolveAssemblies">
-    <Aot AotCompilerPath="$(AotCompilerPath)" AotCompilerBclPath="$(TargetFrameworkDirectory)"
+  <Target Name="_AotCompileAssemblies" DependsOnTargets="_CollectAssemblies">
+    <Aot AotCompilerPath="$(AotCompilerPath)"
          NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
-         ResolvedFrameworkAssemblies="@(ResolvedFrameworkAssemblies)" ResolvedUserAssemblies="@(ResolvedUserAssemblies)"
+         ResolvedFrameworkAssemblies="@(CollectedFrameworkAssemblies)" ResolvedUserAssemblies="@(CollectedUserAssemblies)"
          AotOutputDirectory="$(_XWAotOutputDirectory)" 
          IntermediateAssemblyDirectory="$(_XWIntermediateAssembliesDirectory)" IsDebug="$(GenerateDebuggableAotModules)" 
          GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)">
@@ -175,40 +192,77 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </Aot>
   </Target>
 
-  <Target Name="_GenerateLauncher" DependsOnTargets="_ResolveAssemblies">
-    <GenerateLauncher AotAssemblies="@(ResolvedAssemblies)" BundledAssemblies="@(ResolvedAssemblies)"
+  <Target Name="_GenerateLauncher" DependsOnTargets="_CollectAssemblies">
+    <GenerateLauncher AotAssemblies="@(CollectedAssemblies)" BundledAssemblies="@(CollectedAssemblies)"
         OutputDirectory="$(_XWGeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
         UseCustomPlatformImpl="$(UseCustomPlatformImpl)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
     </GenerateLauncher>
   </Target>
 
-  <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_ResolveAssemblies">
-    <GenerateBundledAssemblies Assemblies="@(ResolvedAssemblies)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
+  <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_CollectAssemblies">
+    <GenerateBundledAssemblies Assemblies="@(CollectedAssemblies)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
     </GenerateBundledAssemblies>
   </Target>
 
-  <Target Name="_CreateNativeWindowsExecutable" DependsOnTargets="_AotCompileAssemblies;_GenerateLauncher;_GenerateBundledAssemblies"> 
-    <PropertyGroup>
-      <CurrentDir>$([System.IO.Path]::GetFullPath('.'))\</CurrentDir>
-    </PropertyGroup>
+  <Target Name="_PrepareNative" DependsOnTargets="_AotCompileAssemblies;_GenerateLauncher;_GenerateBundledAssemblies">
     <ItemGroup>
-      <Inputs Include="@(GeneratedSourceFiles->'$(CurrentDir)%(Identity)')"/>
-      <Inputs Include="@(GeneratedAotFiles->'$(CurrentDir)%(Identity)')"/>
-      <Inputs Include="$(MonoLibsPath)libmonoruntime-sgen.lib"/>
-      <Inputs Include="$(MonoLibsPath)eglib.lib"/>
-      <Inputs Include="$(MonoLibsPath)libgcmonosgen.lib"/>
-      <Inputs Include="$(MonoLibsPath)libmono-static-sgen.lib"/>
-      <Inputs Include="$(MonoLibsPath)libmonoutils.lib"/>
+      <_ClCompile Include="@(GeneratedSourceFiles)" Condition="'%(Extension)' != '.h'"/>
+      <_Object Include="@(GeneratedAotFiles)"/>
     </ItemGroup>
     <PropertyGroup>
-      <Inputs>@(Inputs)</Inputs>
-      <SubOutDir>$(CurrentDir)$(_XWNativeExeOutputDirectory)</SubOutDir>
-      <SubIntDir>$(CurrentDir)$(_XWIntermediateNativeOutputDirectory)</SubIntDir>
-      <SubProps>OutDir=$(SubOutDir);IntDir=$(SubIntDir);Configuration=$(NativeCompilerConfiguration);Platform=$(AotCompilerPlatform);TargetName=$(TargetName);Inputs=$(Inputs)</SubProps>
+      <_XWAdditionalDependencies>Mswsock.lib%3Bws2_32.lib%3Bole32.lib%3Boleaut32.lib%3Bpsapi.lib%3Bversion.lib%3Badvapi32.lib%3Bwinmm.lib%3Bkernel32.lib%3Blibmonoruntime-sgen.lib%3Beglib.lib%3Blibgcmonosgen.lib%3Blibmono-static-sgen.lib%3Blibmonoutils.lib</_XWAdditionalDependencies>
+      <_XWAdditionalLibraryDirectories>$(MonoLibsPath)</_XWAdditionalLibraryDirectories>
     </PropertyGroup>
-    <MSBuild Projects="$(MSBuildThisFileDirectory)CreateNativeWindowsExecutable.vcxproj" Properties="$(SubProps)"/>
+    <ItemGroup>
+      <_None Include="@(CollectedAssemblies)">
+        <Link>%(Filename)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_None>
+      <_None Include="@(CollectedMdbFiles)">
+        <Link>%(Filename)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_None>
+      <_None Include="@(ConvertedMdbFiles)">
+        <Link>%(Filename)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_None>
+      <_None Include="@(CollectedPPdbFiles)">
+        <Link>%(Filename)%(Extension)</Link>
+        <DeploymentContent>true</DeploymentContent>
+      </_None>
+    </ItemGroup>
+    <Delete Files="$(_XWExtractedItemsFile)" Condition="Exists('$(_XWExtractedItemsFile)')"/>  
+    <ExtractItems Items="@(Content)" ItemType="Content" Output="$(_XWExtractedItemsFile)"/>
+    <ExtractItems Items="@(_ClCompile)" ItemType="ClCompile" Output="$(_XWExtractedItemsFile)"/>
+    <ExtractItems Items="@(_Object)" ItemType="Object" Output="$(_XWExtractedItemsFile)"/>
+    <ExtractItems Items="@(_Library)" ItemType="Library" Output="$(_XWExtractedItemsFile)"/>
+    <ExtractItems Items="@(_None)" ItemType="None" Output="$(_XWExtractedItemsFile)"/>
+  </Target>
+
+  <Target Name="_BuildNative" DependsOnTargets="_PrepareNative">
+    <PropertyGroup>
+      <_XWCurrentDir>$([System.IO.Path]::GetFullPath('.'))\</_XWCurrentDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_XWNativeProjectPropsLines Include="&lt;Project xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;"/>
+      <_XWNativeProjectPropsLines Include="  &lt;PropertyGroup&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;OutDir&gt;$(_XWCurrentDir)$(_XWNativeExeOutputDirectory)&lt;/OutDir&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;IntDir&gt;$(_XWCurrentDir)$(_XWIntermediateNativeOutputDirectory)&lt;/IntDir&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;XWAdditionalDependencies&gt;$(_XWAdditionalDependencies)&lt;/XWAdditionalDependencies&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;XWBuildConfiguration&gt;$(NativeBuildConfiguration)&lt;/XWBuildConfiguration&gt;"/>
+      <_XWNativeProjectPropsLines Include="  &lt;/PropertyGroup&gt;"/>
+      <_XWNativeProjectPropsLines Include="  &lt;ItemDefinitionGroup&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;Link&gt;"/>
+      <_XWNativeProjectPropsLines Include="      &lt;AdditionalLibraryDirectories&gt;$(_XWAdditionalLibraryDirectories)&lt;/AdditionalLibraryDirectories&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;/Link&gt;"/>
+      <_XWNativeProjectPropsLines Include="  &lt;/ItemDefinitionGroup&gt;"/>
+      <_XWNativeProjectPropsLines Include="&lt;/Project&gt;"/>
+    </ItemGroup>
+    <WriteLinesToFile File="$(_XWNativeProjectPropsFile)" Lines="@(_XWNativeProjectPropsLines)" Overwrite="true" Encoding="Unicode"/>
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)GenericNativeWindowsExecutable.vcxproj" DestinationFiles="$(_XWNativeProjectFile)" SkipUnchangedFiles="true"/>
+    <MSBuild Projects="$(_XWNativeProjectFile)" Properties="Configuration=$(NativeBuildConfiguration);Platform=$(AotCompilerPlatform)"/>
   </Target>
 
   <Target Name="BuildNative" DependsOnTargets="$(BuildNativeDependsOn)"/> 

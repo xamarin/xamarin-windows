@@ -229,8 +229,8 @@
     <Compile Include="Utilities\Symbols.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\CreateNativeWindowsExecutable.vcxproj">
-      <Link>CreateNativeWindowsExecutable.vcxproj</Link>
+    <None Include="..\GenericNativeWindowsExecutable.vcxproj">
+      <Link>GenericNativeWindowsExecutable.vcxproj</Link>
     </None>
     <None Include="..\Xamarin.Windows.Common.targets">
       <Link>Xamarin.Windows.Common.targets</Link>

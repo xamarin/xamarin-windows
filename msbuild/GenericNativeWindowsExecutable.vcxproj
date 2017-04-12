@@ -1,19 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).props" />
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
+    <ProjectConfiguration Condition="'$(XWBuildConfiguration)|$(Platform)'=='Debug|Win32'" Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
+    <ProjectConfiguration Condition="'$(XWBuildConfiguration)|$(Platform)'=='Release|Win32'" Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
+    <ProjectConfiguration Condition="'$(XWBuildConfiguration)|$(Platform)'=='Debug|x64'" Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
+    <ProjectConfiguration Condition="'$(XWBuildConfiguration)|$(Platform)'=='Release|x64'" Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
@@ -107,27 +108,10 @@
 
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>Mswsock.lib;ws2_32.lib;ole32.lib;oleaut32.lib;psapi.lib;version.lib;advapi32.lib;winmm.lib;kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);$(XWAdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
-  <ItemGroup>
-    <Inputs Include="$(Inputs)"/>
-  </ItemGroup>
-  <Target Name="FilterInputs" BeforeTargets="BeforeClCompile">
-    <ItemGroup>
-      <ClCompile Include="@(Inputs)" Condition="'%(Extension)' == '.c' Or '%(Extension)' == '.cpp' Or '%(Extension)' == '.cxx'"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Object Include="@(Inputs)" Condition="'%(Extension)' == '.obj' Or '%(Extension)' == '.o'"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Library Include="@(Inputs)" Condition="'%(Extension)' == '.lib'"/>
-    </ItemGroup>
-
-    <Message Text="C/C++ sources: @(ClCompile)" />
-    <Message Text="Object files: @(Object)" />
-    <Message Text="Libraries: @(Library)" />
-  </Target>
+  <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).items" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

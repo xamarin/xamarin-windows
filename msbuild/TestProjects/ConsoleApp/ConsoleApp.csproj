@@ -64,7 +64,7 @@
   <Target Name="ConvertPdbFilesTest" DependsOnTargets="Clean;Build;_ConvertPdbFiles" />
   <Target Name="GenerateLauncherTest" DependsOnTargets="Clean;Build;_GenerateLauncher" />
   <Target Name="GenerateBundledAssembliesTest" DependsOnTargets="Clean;Build;_GenerateBundledAssemblies" />
-  <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_CreateNativeWindowsExecutable" />
+  <Target Name="CreateNativeWindowsExecutableTest" DependsOnTargets="Clean;Build;_BuildNative" />
 
   <ItemDefinitionGroup>
     <Items2>
