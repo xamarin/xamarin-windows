@@ -1,3 +1,7 @@
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.vcxproj text eol=crlf
+
 * text eol=lf
 
 *.png binary
