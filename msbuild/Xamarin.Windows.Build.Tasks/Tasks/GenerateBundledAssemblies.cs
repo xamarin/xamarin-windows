@@ -16,10 +16,16 @@ namespace Xamarin.Windows.Tasks
 		public ITaskItem[] Assemblies { get; set; }
 
 		[Required]
+		public ITaskItem[] ConfigFiles { get; set; }
+
+		[Required]
 		public string OutputDirectory { get; set; }
 
 		[Output]
 		public ITaskItem[] GeneratedFiles { get; set; }
+
+		[Output]
+		public ITaskItem[] BundledConfigFiles { get; set; }
 
 		public override bool Execute()
 		{
@@ -35,19 +41,27 @@ namespace Xamarin.Windows.Tasks
 		{
 			Log.LogDebugMessage("GenerateBundledAssemblies Task");
 			Log.LogDebugTaskItems("  Assemblies:", Assemblies);
+			Log.LogDebugTaskItems("  ConfigFiles:", ConfigFiles);
 
 			if (!Directory.Exists(OutputDirectory)) {
 				Directory.CreateDirectory(OutputDirectory);
 			}
 
 			var outputFiles = new List<string>();
+			var bundledConfigFiles = new List<string>();
 			foreach (var assembly in Assemblies) {
 				var outputFile = Path.Combine(OutputDirectory, Path.GetFileName(assembly.ItemSpec) + ".c");
-				GenerateBundledAssembly(assembly.ItemSpec, outputFile);
+				string configFile;
+				GenerateBundledAssembly(assembly.ItemSpec, outputFile, out configFile);
 				outputFiles.Add(outputFile);
+				if (configFile != null) {
+					bundledConfigFiles.Add(configFile);
+				}
 			}
 			GeneratedFiles = outputFiles.Select(f => new TaskItem(f)).ToArray();
+			BundledConfigFiles = bundledConfigFiles.Select(f => new TaskItem(f)).ToArray();
 			Log.LogDebugTaskItems("  [Output] GeneratedFiles:", GeneratedFiles);
+			Log.LogDebugTaskItems("  [Output] BundledConfigFiles:", BundledConfigFiles);
 
 			return true;
 		}
@@ -67,7 +81,7 @@ namespace Xamarin.Windows.Tasks
 			}
 		}
 
-		public void GenerateBundledAssembly(string assemblyFile, string outputFile)
+		public void GenerateBundledAssembly(string assemblyFile, string outputFile, out string configFile)
 		{
 			Log.LogDebugMessage($"  Generating output '{outputFile}' from assembly '{assemblyFile}'");
 			var assemblyName = Symbols.GetBundledAssemblyName(assemblyFile, Log);
@@ -85,7 +99,8 @@ namespace Xamarin.Windows.Tasks
 
 					outs.WriteLine("typedef struct { const char* name; const char* data; } MonoBundledAssemblyConfig;");
 					try {
-						var configFile = assemblyFile + ".config";
+						var configName = (assemblyName + ".config").ToLower();
+						configFile = ConfigFiles.First(t => Path.GetFileName(t.ItemSpec ?? "").ToLower() == configName).ItemSpec;
 						using (var cfgs = File.OpenRead(configFile)) {
 							Log.LogDebugMessage($"    Found assembly config file '{configFile}' for assembly '{assemblyFile}'");
 							outs.WriteLine("static const char config_data [] = {");
@@ -93,8 +108,9 @@ namespace Xamarin.Windows.Tasks
 							outs.WriteLine("0};");
 							outs.WriteLine($"static const MonoBundledAssemblyConfig config = {{\"{assemblyName}\", config_data}};");
 						}
-					} catch (FileNotFoundException) {
+					} catch {
 						// Return NULL if the assembly has no config file.
+						configFile = null;
 						Log.LogDebugMessage($"    No assembly config file found for assembly '{assemblyFile}'");
 						outs.WriteLine($"static const MonoBundledAssemblyConfig config = {{\"{assemblyName}\", 0L}};");
 					}

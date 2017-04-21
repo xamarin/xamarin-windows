@@ -157,6 +157,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         <Output TaskParameter="ResolvedFrameworkAssemblies" ItemName="ResolvedFrameworkAssemblies" />
         <Output TaskParameter="ResolvedPdbFiles" ItemName="ResolvedPdbFiles" />
         <Output TaskParameter="ResolvedMdbFiles" ItemName="ResolvedMdbFiles" />
+        <Output TaskParameter="ResolvedConfigFiles" ItemName="ResolvedConfigFiles" />
     </ResolveAssemblies>
   </Target>
 
@@ -164,11 +165,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Copy SourceFiles="@(ResolvedAssemblies)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
     <Copy SourceFiles="@(ResolvedPdbFiles)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
     <Copy SourceFiles="@(ResolvedMdbFiles)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="true"/>
+    <Copy SourceFiles="@(ResolvedConfigFiles)" DestinationFolder="$(_XWIntermediateAssembliesDirectory)" SkipUnchangedFiles="false"/>
+    <Copy SourceFiles="@(ResolvedAssemblies -> '$(OutputPath)%(Filename)%(Extension).config')" DestinationFolder="$(_XWIntermediateAssembliesDirectory)"
+          SkipUnchangedFiles="false" Condition="Exists('$(OutputPath)%(Filename)%(Extension).config')"/>
     <ItemGroup>
       <CollectedUserAssemblies Include="@(ResolvedUserAssemblies -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
       <CollectedFrameworkAssemblies Include="@(ResolvedFrameworkAssemblies -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
       <CollectedPdbFiles Include="@(ResolvedPdbFiles -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
       <CollectedMdbFiles Include="@(ResolvedMdbFiles -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension)')"/>
+      <CollectedConfigFiles Include="@(ResolvedAssemblies -> '$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension).config')" Condition="Exists('$(_XWIntermediateAssembliesDirectory)%(Filename)%(Extension).config')"/>
       <CollectedAssemblies Include="@(CollectedUserAssemblies)"/>
       <CollectedAssemblies Include="@(CollectedFrameworkAssemblies)"/>
     </ItemGroup>
@@ -201,8 +206,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </Target>
 
   <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_CollectAssemblies">
-    <GenerateBundledAssemblies Assemblies="@(CollectedAssemblies)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
+    <GenerateBundledAssemblies Assemblies="@(CollectedAssemblies)" ConfigFiles="@(CollectedConfigFiles)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
+      <Output TaskParameter="BundledConfigFiles" ItemName="BundledConfigFiles" />
     </GenerateBundledAssemblies>
   </Target>
 

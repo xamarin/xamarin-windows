@@ -52,6 +52,9 @@
     <None Include="ConsoleApp.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="mscorlib.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\..\..\Xamarin.Windows.CSharp.targets" />
   <PropertyGroup>

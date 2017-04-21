@@ -28,6 +28,7 @@ namespace Xamarin.Windows.Build.Tests
 		};
 
 		private static readonly string IntermediateOutputPath = Path.Combine("obj", "Debug", "XW");
+		private static readonly string IntermediateAssemOutputPath = Path.Combine(IntermediateOutputPath, "Assem");
 		private static readonly string AotOutputDirectory = Path.Combine(IntermediateOutputPath, "Aot");
 		private static readonly string GeneratedCodeOutputDirectory = Path.Combine(IntermediateOutputPath, "Gen");
 		private static readonly string OutputDirectory = Path.Combine("bin", "Debug");
@@ -41,16 +42,19 @@ namespace Xamarin.Windows.Build.Tests
 			var userAssemblies = GetPathItems(result, "ResolvedUserAssemblies");
 			var resolvedMdbFiles = GetPathItems(result, "ResolvedMdbFiles");
 			var resolvedPdbFiles = GetPathItems(result, "ResolvedPdbFiles");
+			var resolvedConfigFiles = GetPathItems(result, "ResolvedConfigFiles");
 			var assembliesWithSymbols = resolvedPdbFiles
 				.Select(Path.GetFileNameWithoutExtension)
 				.Union(resolvedMdbFiles.Select(Path.GetFileNameWithoutExtension).Select(Path.GetFileNameWithoutExtension))
 				.ToArray();
 			var expectedFrameworkAssemblies = ConsoleAppFrameworkAssemblies.Select(s => $"{prefix}\\{s}").ToArray();
 			var expectedAssembliesWithSymbols = expectedFrameworkAssemblies.Union(ConsoleAppUserAssemblies).Select(Path.GetFileNameWithoutExtension).ToArray();
+			var expectedConfigFiles = new [] {ConsoleAppUserAssemblies[0] + ".config"};
 			CollectionAssert.AreEquivalent(userAssemblies.Union(frameworkAssemblies), allAssemblies);
 			CollectionAssert.AreEquivalent(expectedFrameworkAssemblies, frameworkAssemblies);
 			CollectionAssert.AreEquivalent(ConsoleAppUserAssemblies, userAssemblies);
 			CollectionAssert.AreEquivalent(expectedAssembliesWithSymbols, assembliesWithSymbols);
+			CollectionAssert.AreEquivalent(expectedConfigFiles, resolvedConfigFiles);
 		}
 
 		[Test]
@@ -104,7 +108,7 @@ namespace Xamarin.Windows.Build.Tests
 			var intermediateAssemDir = Path.Combine(projectDir, @"obj\Debug\XW\Assem");
 			var result = BuildProject("ConsoleApp", targets: "ConvertPdbFilesTest", properties: new { MonoDevRoot });
 			var actualMdbFiles = Directory.GetFiles(TestProjectsRoot, "*.mdb", SearchOption.AllDirectories).OrderBy(s => s).Select(ReplaceRoots);
-			var expectedMdbFiles = ConsoleAppUserAssemblies.Select(f => Path.Combine(intermediateAssemDir, Path.GetFileName(f) + ".mdb")).Select(ReplaceRoots);
+			var expectedMdbFiles = ConsoleAppUserAssemblies.Select(f => Path.Combine(intermediateAssemDir, Path.GetFileName(f) + ".mdb")).Select(ReplaceRoots).ToArray();
 			CollectionAssert.AreEquivalent(expectedMdbFiles, actualMdbFiles);
 			var outputMdbFiles = GetPathItems(result, "ConvertedMdbFiles").Select(p => Path.Combine(projectDir, p)).Select(ReplaceRoots);
 			var outputPPdbFiles = GetPathItems(result, "CollectedPPdbFiles").Select(p => Path.Combine(projectDir, p)).Select(ReplaceRoots);
@@ -125,9 +129,10 @@ namespace Xamarin.Windows.Build.Tests
 		[Test]
 		public void GenerateBundledAssemblies()
 		{
-			var outputDir = Path.Combine(GetTestProjectDir("ConsoleApp"), GeneratedCodeOutputDirectory);
+			var intAssemDir = Path.Combine(GetTestProjectDir("ConsoleApp"), IntermediateAssemOutputPath);
+			var genDir = Path.Combine(GetTestProjectDir("ConsoleApp"), GeneratedCodeOutputDirectory);
 			var result = BuildProject("ConsoleApp", targets: "GenerateBundledAssembliesTest", properties: new { MonoDevRoot });
-			var actualCFiles = Directory.GetFiles(outputDir, "*.c", SearchOption.AllDirectories)
+			var actualCFiles = Directory.GetFiles(genDir, "*.c", SearchOption.AllDirectories)
 					.Select(Path.GetFileName).OrderBy(s => s);
 			Console.WriteLine(string.Join(" ", actualCFiles));
 			var expectedCFiles = ConsoleAppFrameworkAssemblies
@@ -135,8 +140,14 @@ namespace Xamarin.Windows.Build.Tests
 					.Select(s => s + ".c").OrderBy(s => s);
 			CollectionAssert.AreEquivalent(expectedCFiles, actualCFiles);
 			var actualGeneratedSourceFiles = GetPathItems(result, "GeneratedSourceFiles");
+			var actualBundledConfigFiles = GetPathItems(result, "BundledConfigFiles").Select(p => Path.Combine(GetTestProjectDir("ConsoleApp"), p)).Select(ReplaceRoots);
 			var expectedGeneratedSourceFiles = expectedCFiles.Select(f => Path.Combine(GeneratedCodeOutputDirectory, f));
+			var expectedBundledConfigFiles = new [] {
+				$"{intAssemDir}\\ConsoleApp.exe.config",
+				$"{intAssemDir}\\mscorlib.dll.config"
+			}.Select(ReplaceRoots);
 			CollectionAssert.AreEquivalent(expectedGeneratedSourceFiles, actualGeneratedSourceFiles);
+			CollectionAssert.AreEquivalent(expectedBundledConfigFiles, actualBundledConfigFiles);
 		}
 
 		[Test]

@@ -43,6 +43,9 @@ namespace Xamarin.Windows.Tasks
 		[Output]
 		public ITaskItem[] ResolvedMdbFiles { get; set; }
 
+		[Output]
+		public ITaskItem[] ResolvedConfigFiles { get; set; }
+
 		public override bool Execute()
 		{
 			using (var resolver = new DirectoryAssemblyResolver(Log.LogWarning, loadDebugSymbols: false)) {
@@ -99,6 +102,7 @@ namespace Xamarin.Windows.Tasks
 			// pdb files have the .dll/.exe removed, e.g. mscorlib.pdb
 			ResolvedPdbFiles = assemblies.Select(a => a.Substring(0, a.LastIndexOf('.'))).Select(a => $"{a}.pdb")
 					.Where(File.Exists).Select(a => new TaskItem(a)).ToArray();
+			ResolvedConfigFiles = assemblies.Select(a => $"{a}.config").Where(File.Exists).Select(a => new TaskItem(a)).ToArray();
 			ResolvedFrameworkAssemblies = ResolvedAssemblies.Where(p => IsFrameworkAssembly(p.ItemSpec, true)).ToArray();
 			ResolvedUserAssemblies = ResolvedAssemblies.Where(p => !IsFrameworkAssembly(p.ItemSpec, true)).ToArray();
 
@@ -107,6 +111,7 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugTaskItems("  [Output] ResolvedFrameworkAssemblies:", ResolvedFrameworkAssemblies);
 			Log.LogDebugTaskItems("  [Output] ResolvedMdbFiles:", ResolvedMdbFiles);
 			Log.LogDebugTaskItems("  [Output] ResolvedPdbFiles:", ResolvedPdbFiles);
+			Log.LogDebugTaskItems("  [Output] ResolvedConfigFiles:", ResolvedConfigFiles);
 
 			return !Log.HasLoggedErrors;
 		}
