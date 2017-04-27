@@ -1,13 +1,8 @@
 ﻿using Mono.Debugging.Soft;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mono.Debugging.Client;
 using EnvDTE;
 using System.IO;
-using System.Diagnostics;
 
 namespace Xamarin.Windows
 {
