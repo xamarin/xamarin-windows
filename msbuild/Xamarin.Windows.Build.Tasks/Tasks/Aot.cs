@@ -139,7 +139,7 @@ namespace Xamarin.Windows.Tasks
 				var assemblyPath = Path.GetFullPath(assembly.ItemSpec);
 				if (OnlyRecompileIfChanged && File.Exists(outputFile) && File.Exists(assemblyPath) 
 						&& File.GetLastWriteTime(outputFile) >= File.GetLastWriteTime(assemblyPath)) {
-					Log.LogDebugMessage("  Not recompiling unchanged assembly: {0}", assemblyPath);
+					Log.LogMessage(MessageImportance.High, "  Not recompiling unchanged assembly: {0}", assemblyPath);
 					continue;
 				}
 
@@ -184,10 +184,12 @@ namespace Xamarin.Windows.Tasks
 				args.Add("--aot=" + string.Join(",", aotOptions));
 				args.Add('"' + assemblyPath + '"');
 
+				Log.LogMessage(MessageImportance.High, "  AOT compiling assembly: {0}", assemblyPath);
 				if (!RunAotCompiler(AotCompilerPath, args, assembliesPath)) {
 					Log.LogCodedError("XW3001", "Could not AOT compile the assembly: {0}", assemblyPath);
 					return false;
 				}
+				Log.LogMessage(MessageImportance.High, "  AOT compilation of {0} finished", Path.GetFileName(assemblyPath));
 			}
 
 			GeneratedFiles = outputFiles.Select(f => new TaskItem(f)).ToArray();
@@ -213,7 +215,7 @@ namespace Xamarin.Windows.Tasks
 			psi.EnvironmentVariables["MONO_PATH"] = assembliesPath;
 			psi.EnvironmentVariables["PATH"] = NativeToolchainPaths;
 
-			Log.LogDebugMessage("  [AOT] PATH=\"{0}\" MONO_PATH=\"{1}\" MONO_ENV_OPTIONS=\"{2}\" {3} {4}",
+			Log.LogMessage(MessageImportance.High, "    [AOT] PATH=\"{0}\" MONO_PATH=\"{1}\" MONO_ENV_OPTIONS=\"{2}\" {3} {4}",
 				psi.EnvironmentVariables["PATH"],
 				psi.EnvironmentVariables["MONO_PATH"],
 				psi.EnvironmentVariables["MONO_ENV_OPTIONS"],
@@ -235,13 +237,13 @@ namespace Xamarin.Windows.Tasks
 		void OnAotOutputData(object sender, DataReceivedEventArgs e)
 		{
 			if (e.Data != null)
-				Log.LogMessage("  [aot-compiler stdout] {0}", e.Data);
+				Log.LogMessage(MessageImportance.High, "    [aot-compiler stdout] {0}", e.Data);
 		}
 
 		void OnAotErrorData(object sender, DataReceivedEventArgs e)
 		{
 			if (e.Data != null)
-				Log.LogMessage("  [aot-compiler stderr] {0}", e.Data);
+				Log.LogMessage(MessageImportance.High, "    [aot-compiler stderr] {0}", e.Data);
 		}
 
 	}
