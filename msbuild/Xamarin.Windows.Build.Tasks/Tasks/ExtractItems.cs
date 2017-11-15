@@ -43,6 +43,10 @@ namespace Xamarin.Windows.Tasks
 
         public string LinkMetadataName { get; set; }
 
+        public bool IgnoreFullPaths { get; set; }
+
+        public bool IgnoreLinks { get; set; }
+
         public override bool Execute()
         {
             try
@@ -77,20 +81,27 @@ namespace Xamarin.Windows.Tasks
                 Log.LogDebugMessage("  ItemType: " + ItemType);
                 Log.LogDebugMessage("  Output: " + Output);
                 Log.LogDebugMessage("  LinkMetadataName: " + LinkMetadataName);
+                Log.LogDebugMessage("  IgnoreFullPaths: " + IgnoreFullPaths);
+                Log.LogDebugMessage("  IgnoreLinks: " + IgnoreLinks);
                 Log.LogDebugMessage("  Items:");
 
                 foreach (ITaskItem item in Items)
                 {
-                    var absoluteInclude = Path.GetFullPath(item.ItemSpec);
-                    Log.LogDebugMessage($"    <{ItemType} Include=\"{absoluteInclude}\">");
+                    IDictionary customMetadata = item.CloneCustomMetadata ();
+                    string includePath = "";
+                    if (!IgnoreFullPaths && !customMetadata.Contains ("_IgnoreFullPath"))
+                        includePath = Path.GetFullPath (item.ItemSpec);
+                    else
+                        includePath = item.ItemSpec;
+
+                    Log.LogDebugMessage($"    <{ItemType} Include=\"{includePath}\">");
                     XmlElement itemElement = doc.CreateElement(ItemType, MSBuildNamespace);
                     XmlAttribute a = doc.CreateAttribute("Include");
-                    a.Value = absoluteInclude;
+                    a.Value = includePath;
                     itemElement.Attributes.Append(a);
-                    IDictionary customMetadata = item.CloneCustomMetadata();
 
                     var currDir = Canonicalize(Environment.CurrentDirectory);
-                    if (!Path.IsPathRooted(item.ItemSpec) 
+                    if (!IgnoreLinks && !customMetadata.Contains ("_IgnoreLink") && !Path.IsPathRooted(item.ItemSpec)
                         && Canonicalize(Path.GetDirectoryName(Path.GetFullPath(item.ItemSpec))).ToLowerInvariant() != currDir.ToLowerInvariant() 
                         && !customMetadata.Contains(LinkMetadataName)) {
 
@@ -103,9 +114,13 @@ namespace Xamarin.Windows.Tasks
                     {
                         var value = item.GetMetadata(name);
                         Log.LogDebugMessage($"      <{name}>{value}</{name}>");
-                        XmlElement md = doc.CreateElement(name, MSBuildNamespace);
-                        md.InnerText = value;
-                        itemElement.AppendChild(md);
+
+                        if (!name.StartsWith ("_", StringComparison.Ordinal))
+                        {
+                            XmlElement md = doc.CreateElement (name, MSBuildNamespace);
+                            md.InnerText = value;
+                            itemElement.AppendChild (md);
+                        }
                     }
                     group.AppendChild(itemElement);
                     Log.LogDebugMessage($"    </{ItemType}>");
