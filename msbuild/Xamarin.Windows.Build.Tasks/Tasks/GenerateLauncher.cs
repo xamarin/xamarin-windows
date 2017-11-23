@@ -84,7 +84,7 @@ namespace Xamarin.Windows.Tasks
 				};
 			}).ToList();
 
-			var nl = Environment.NewLine;
+			var nl = "\n";
 			var launcher = string.IsNullOrEmpty(LauncherTemplatePath) ? Resources.LauncherTemplate : File.ReadAllText(LauncherTemplatePath);
 
 			var aotModules = new StringBuilder()
@@ -130,9 +130,12 @@ namespace Xamarin.Windows.Tasks
 			if (!string.IsNullOrEmpty(CustomDefines)) {
 				defines.AddRange(CustomDefines.Split(';'));
 			}
+
+			defines.RemoveAll (d => String.IsNullOrWhiteSpace (d));
+
 			defines = defines
 				.Select(d => d.Split("=".ToCharArray(), 2))
-				.Select(a => "#define " + string.Join(" ", a.ToArray())).ToList();
+				.Select(a => "#define " + string.Join(" ", a.ToArray()).Trim()).ToList();
 			launcher = Regex.Replace(launcher, @"(//\s*)\$\{Defines\}", string.Join(nl, defines));
 
 			launcher = Regex.Replace(launcher, @"\$\{MainAssemblyName\}", mainAssemblyName ?? "");
