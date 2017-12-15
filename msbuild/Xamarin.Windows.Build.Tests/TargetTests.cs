@@ -137,7 +137,7 @@ namespace Xamarin.Windows.Build.Tests
 			Console.WriteLine(string.Join(" ", actualCFiles));
 			var expectedCFiles = ConsoleAppFrameworkAssemblies
 					.Union(ConsoleAppUserAssemblies.Select(Path.GetFileName))
-					.Select(s => s + ".c").OrderBy(s => s);
+					.Select(s => s + ".bundle.c").OrderBy(s => s);
 			CollectionAssert.AreEquivalent(expectedCFiles, actualCFiles);
 			var actualGeneratedSourceFiles = GetPathItems(result, "GeneratedSourceFiles");
 			var actualBundledConfigFiles = GetPathItems(result, "BundledConfigFiles").Select(p => Path.Combine(GetTestProjectDir("ConsoleApp"), p)).Select(ReplaceRoots);
