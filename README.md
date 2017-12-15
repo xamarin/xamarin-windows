@@ -39,8 +39,8 @@ By default a mono checkout is expected in `mono/external`. Create a
 checkout with a `MonoDevRoot` property to override the path to the mono
 checkout.
 
-**NOTE: A specific mono commit is expected to be checked out. Check the
-**`MonoCommit` property in the `Xamarin.Windows.props` file.
+**NOTE**: A specific mono commit is expected to be checked out. Check the
+`MonoCommit` property in the `Xamarin.Windows.props` file.
 
 Run from within cygwin:
 ```bash
