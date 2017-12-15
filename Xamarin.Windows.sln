@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test projects", "Test projects", "{0E33E380-D880-47C9-A9BD-342D365CC29E}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Windows.Build.Tasks", "msbuild\Xamarin.Windows.Build.Tasks\Xamarin.Windows.Build.Tasks.csproj", "{36907F0D-086C-4144-A532-4E277EA0CEFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Windows.Build.Tests", "msbuild\Xamarin.Windows.Build.Tests\Xamarin.Windows.Build.Tests.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{36907F0D-086C-4144-A532-4E277EA0CEFF} = {36907F0D-086C-4144-A532-4E277EA0CEFF}
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test projects", "Test projects", "{0E33E380-D880-47C9-A9BD-342D365CC29E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "msbuild\TestProjects\ConsoleApp\ConsoleApp.csproj", "{D13393BF-7B03-49D1-92B4-A48D74EE2FEC}"
 EndProject
@@ -135,5 +135,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D13393BF-7B03-49D1-92B4-A48D74EE2FEC} = {0E33E380-D880-47C9-A9BD-342D365CC29E}
 		{E18716AC-C8E0-4A90-90B2-CED6F9C17EE8} = {0E33E380-D880-47C9-A9BD-342D365CC29E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {04C374B7-E11F-448E-9012-11837B120398}
 	EndGlobalSection
 EndGlobal

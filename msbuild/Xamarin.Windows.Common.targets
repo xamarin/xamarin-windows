@@ -73,13 +73,24 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <_XWExtractedItemsFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).items</_XWExtractedItemsFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <VS15Install Condition="'$(VS15Install)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7@15.0)</VS15Install>
+    <VS15Install Condition="'$(VS15Install)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7@15.0)</VS15Install>
+
+    <VS14Install Condition="'$(VS14Install)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7@14.0)</VS14Install>
+    <VS14Install Condition="'$(VS14Install)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7@14.0)</VS14Install>
+    <VS14Install Condition="'$(VS14Install)' == '' And Exists('$(VS140COMNTOOLS)')">$([System.IO.Directory]::GetParent("$(VS140COMNTOOLS)").Parent.Parent.FullName)\</VS14Install> 
+  </PropertyGroup>
+
+  <Import Project="$(VS15Install)VC\Auxiliary\Build\Microsoft.ClangC2Version.default.props" Condition="Exists('$(VS15Install)VC\Auxiliary\Build\Microsoft.ClangC2Version.default.props')" />
+
   <!-- Toolchain setup -->
   <PropertyGroup>
     <AotCompilerPlatform Condition="'$(AotCompilerPlatform)' == ''">x64</AotCompilerPlatform>
     <AotCompilerConfiguration Condition="'$(AotCompilerConfiguration)' == ''">Release</AotCompilerConfiguration>
     <AotCompilerPath Condition="'$(AotCompilerPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\mono-sgen.exe</AotCompilerPath>
-    <VSInstall Condition="'$(VSInstall)' == ''">$([System.IO.Directory]::GetParent("$(VSSDK140Install)").Parent.FullName)\</VSInstall>
-    <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == ''">$(VSInstall)VC\ClangC2\bin\amd64</NativeToolchainPaths>
+    <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == '' And '$(VisualStudioVersion)' == '15.0'">$(VS15Install)VC\Tools\ClangC2\$(ClangC2Version)\bin\HostX64</NativeToolchainPaths>
+    <NativeToolchainPaths Condition="'$(NativeToolchainPaths)' == '' And '$(VisualStudioVersion)' == '14.0'">$(VS14Install)VC\ClangC2\bin\amd64</NativeToolchainPaths>
     <NativeBuildConfiguration Condition="'$(NativeBuildConfiguration)' == ''">Release</NativeBuildConfiguration>
     <MonoLibsPath Condition="'$(MonoLibsPath)' == ''">$(MSBuildThisFileDirectory)$(AotCompilerPlatform)\$(AotCompilerConfiguration)\</MonoLibsPath>
   </PropertyGroup>

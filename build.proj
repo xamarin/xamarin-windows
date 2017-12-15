@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GitInfoReportImportance>high</GitInfoReportImportance>
+    <GitVersionFile>VERSION</GitVersionFile>
+  </PropertyGroup>
+
+  <Target Name="GitInfoReport" />
+  <Target Name="GitInfo" />
+  <Target Name="GitVersion" />
+
+  <Target Name="GetXamarinWindowsProductVersions" DependsOnTargets="GitVersion;GitInfoReport">
+    <PropertyGroup>
+      <XamarinWindowsMajor>$(GitSemVerMajor)</XamarinWindowsMajor>
+      <XamarinWindowsMinor>$(GitSemVerMinor)</XamarinWindowsMinor>
+      <XamarinWindowsBuild>$(GitBaseVersion.Substring($(GitBaseVersion.LastIndexOf('.'))).TrimStart('.'))</XamarinWindowsBuild>
+      <XamarinWindowsRevision>$(GitCommits)</XamarinWindowsRevision>
+      <XamarinWindowsCommit>$(GitCommit)</XamarinWindowsCommit>
+      <XamarinWindowsFullCommit>$(GitSha)</XamarinWindowsFullCommit>
+      <XamarinWindowsVersion>$(XamarinWindowsMajor).$(XamarinWindowsMinor).$(XamarinWindowsBuild).$(XamarinWindowsRevision)</XamarinWindowsVersion>
+      <XamarinWindowsFullVersion>$(XamarinWindowsVersion)_$(XamarinWindowsCommit)</XamarinWindowsFullVersion>
+    </PropertyGroup>
+    <Message Text="XamarinWindowsMajor=$(XamarinWindowsMajor)"/>
+    <Message Text="XamarinWindowsMinor=$(XamarinWindowsMinor)"/>
+    <Message Text="XamarinWindowsBuild=$(XamarinWindowsBuild)"/>
+    <Message Text="XamarinWindowsRevision=$(XamarinWindowsRevision)"/>
+    <Message Text="XamarinWindowsCommit=$(XamarinWindowsCommit)"/>
+    <Message Text="XamarinWindowsFullCommit=$(XamarinWindowsFullCommit)"/>
+    <Message Text="XamarinWindowsVersion=$(XamarinWindowsVersion)"/>
+    <Message Text="XamarinWindowsFullVersion=$(XamarinWindowsFullVersion)"/>
+  </Target>
+
+</Project>
