@@ -3,9 +3,15 @@
 Configuration.OperatingSystem.props
 msfinal.pub
 packages/
+build/
 .DS_Store
 .nuget
 .vs/
+/buildtools/
+/external/mono/
+GitInfo.cache
+tests/TestResult*.xml
+/tmp/
 
 # Visual Studio / MonoDevelop
 *.[Oo]bj

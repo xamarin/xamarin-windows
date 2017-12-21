@@ -10,29 +10,51 @@ Goals for this project:
 
 # Build instructions
 
-You will need Cygwin, Visual Studio 2015 and a Mono for Windows release
-installed in order to build this project. Consult the [Compiling Mono on
-Windows](http://www.mono-project.com/docs/compiling-mono/windows/)
-documentation for more details on the prerequisites.
+In order to build this project you'll need:
+
+* **Git for Windows**
+* **Visual Studio 2017**
+* **Clang2** 
+* **Windows 8.1 SDK and all Windows 10 SDKs** 
+You'll find Clang2 and the Windows SDKs in the Visual Studio 2017 setup, under the "Individual components" tab.
+* **Mono for Windows** release
+
 
 **NOTE**: Windows has a problem with long (> 260 characters) paths. To avoid
 any issues related to this limitation when building this project you should
 make sure to checkout this repository in a shallow path on your system. E.g.
 to `C:\xw`:
 
-```bash
-cd /cygdrive/c/
+```
+cd C:\
 git clone git@github.com:xamarin/xamarin-windows.git xw
-cd xw/
+cd xw
 ```
 
-## Fetch submodules
+## Build using build.cmd
 
-```bash
+To build the project just run the `build.cmd` script.
+
+## Manual build
+
+When developing on this project you may prefer to run the individual steps
+carried out by `build.cmd` manually.
+
+For a manual build you will need Cygwin installed. Consult the [Compiling Mono
+on Windows](http://www.mono-project.com/docs/compiling-mono/windows/)
+documentation for more details on the prerequisites.
+
+The commands below asumes Visual Studio 2017 **Enterprise** is installed. This is **not required**.
+Adjust the paths to Visual Studio according to the specific flavor of your Visual Studio 2017 installation.
+
+### Fetch submodules
+
+```
+cd C:\xw
 git submodule update --init --recursive
 ```
 
-## Build the mono winaot BCL profile
+### Build the mono winaot BCL profile
 
 By default a mono checkout is expected in `mono/external`. Create a
 `Xamarin.Windows.Override.props` file in the root of the `xamarin-windows`
@@ -48,56 +70,56 @@ cd path/to/mono
 git checkout <commit>
 ./autogen.sh --host=x86_64-w64-mingw32 --disable-boehm --with-runtime_preset=winaot
 export MONO_EXECUTABLE="`cygpath -u -a msvc\\\build\\\sgen\\\x64\\\bin\\\Release\\\mono-sgen.exe`"
-export VC_ROOT="/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC"
-export PATH="$VC_ROOT/ClangC2/bin/amd64:$VC_ROOT/bin/amd64":$PATH
-/cygdrive/c/Program\ Files\ \(x86\)/MSBuild/14.0/Bin/MSBuild.exe /p:PlatformToolset=v140 /p:Platform=x64 /p:Configuration=Release /p:MONO_TARGET_GC=sgen msvc/mono.sln
+export VC_ROOT="/cygdrive/c/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/VC"
+export CLANG2_VERSION=$(sed -n 1p "$VC_ROOT/Auxiliary/Build/Microsoft.ClangC2Version.default.txt" | sed 's/\s//g')
+export VCTOOLS_VERSION=$(sed -n 1p "$VC_ROOT/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt" | sed 's/\s//g')
+export PATH="$VC_ROOT/Tools/ClangC2/$CLANG2_VERSION/bin/HostX64":"$VC_ROOT/Tools/MSVC/$VCTOOLS_VERSION/bin/HostX64/x64":$PATH
+/cygdrive/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/Enterprise/MSBuild/15.0/Bin/MSBuild.exe /p:PlatformToolset=v140 /p:Platform=x64 /p:Configuration=Release /p:MONO_TARGET_GC=sgen msvc/mono.sln
 make -C mcs/
 ```
 
-## Copy reference assemblies
+### Copy reference assemblies to the build folder
 
-**NOTE**: Visual Studio typically locks the files which will be copied here.
-You may have to close VS before running this command.
-
-Run the following in an Administrator `cmd.exe`:
+The VS extension relies on the Mono BCL to be present in the
+`build/ReferenceAssemblies/` folder. Run the following to copy the relevant
+files:
 ```
 cd C:\xw
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe" msbuild\CopyReferenceAssembliesFromMonoDevRoot.proj
 ```
 
-## Create the MSBuild toolchain
+### Create the MSBuild toolchain in the build folder
 
 The VS extension relies on the MSBuild files and the mono installation being
-installed under `C:\Program Files (x86)\MSBuild\Xamarin\Windows`.
-
-Run the following in an Administrator `cmd.exe`:
+installed in `build/MSBuild/`. Run the following to copy the relevant files:
 ```
 cd C:\xw
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" msbuild\CreateToolchain.proj
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe" msbuild\CreateToolchain.proj
 ```
 
-This step has to be repeated whenever you change the MSBuild files or tasks
-and want the changes to be picked up by the VS extension.
-
-## Build the Xamarin.Windows solution
+### Build the MSBuild tasks and VS extension
 
 You should now be able to open the `Xamarin.Windows.sln` solution and build
 it.
 
-# Usage
 
-**NOTE!** For now, Xamarin needs to be installed in Visual Studio. Make sure to enable that in the Visual Studio setup.
+### Debugging the VS extension
 
-Launch the Xamarin.Windows.VisualStudio.Vsix project from within VS. Look for
-the Xamarin Windows templates when creating new projects.
+**NOTE!** For now, Xamarin needs to be installed in Visual Studio. Make sure
+to enable that in the Visual Studio setup.
 
-To run a full AOT compile of a `.csproj` from the command-line run:
+At this time VS extensions with embedded MSBuild files or Reference Assemblies
+are not properly deployed to the experimental instance. We need to setup
+symbolic linkes to make sure the VS process correctly loads the MSBuild and
+Reference Assemblies from the `$MSBuild` and `$ReferenceAssemblies` folders
+located inside the extension folder in the experimental instance folder:
 
 ```
-"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" /v:Detailed /t:BuildNative <csproj-file>
+mklink /D "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\Xamarin\Windows" "%USERPROFILE%\AppData\Local\Microsoft\VisualStudio\15.0_485e8a4fExp\Extensions\Xamarin\Xamarin SDK for Windows\<version>\$MSBuild\Xamarin\Windows"
+mklink /D "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\Xamarin.Windows" "%USERPROFILE%\AppData\Local\Microsoft\VisualStudio\15.0_485e8a4fExp\Extensions\Xamarin\Xamarin SDK for Windows\<version>\$ReferenceAssemblies\Microsoft\Framework\Xamarin.Windows"
 ```
 
-The native `.exe` should now be in the project's `bin/Debug/Native/` folder.
+It should now be possible to debug the extension in VS.
 
 
 # Converting an ordinary C# project to a Xamarin.Windows project
