@@ -4,14 +4,13 @@
   <Import Project="$(MSBuildThisFileDirectory)..\Xamarin.Windows.props"/>
 
   <PropertyGroup>
-    <XamarinWindowsMSBuildPath Condition="'$(XamarinWindowsMSBuildPath)' == ''">C:\Program Files (x86)\MSBuild\Xamarin\Windows</XamarinWindowsMSBuildPath>
+    <ToolchainsInstallPath Condition="'$(ToolchainsInstallPath)' == ''">$(MSBuildThisFileDirectory)..\build\MSBuild</ToolchainsInstallPath>
   </PropertyGroup>
 
   <Target Name="Build" DependsOnTargets="ValidateMonoDevRoot">
 
     <PropertyGroup>
       <ToolchainsBuildPath>$(MonoDevRoot)\msvc\build\toolchains</ToolchainsBuildPath>
-      <ToolchainsInstallPath>$(XamarinWindowsMSBuildPath)</ToolchainsInstallPath>
       <CommonBuildProperties>PlatformToolset=v140;MONO_TARGET_GC=sgen;MONO_BUILD_DIR_PREFIX=$(ToolchainsBuildPath)\</CommonBuildProperties>
     </PropertyGroup>
 
@@ -38,13 +37,6 @@
     </ItemGroup>
 
     <Copy SourceFiles="@(Files -> '$(ToolchainsBuildPath)\%(Platform)\%(Folder)\%(Configuration)\%(Identity)')" DestinationFiles="@(Files -> '$(ToolchainsInstallPath)\%(Platform)\%(Configuration)\%(Identity)')"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Common.Targets" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.CSharp.Targets" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)GenericNativeWindowsExecutable.vcxproj" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Xamarin.Windows.Build.Tasks.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Mono.Cecil.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-    <Copy SourceFiles="$(MSBuildThisFileDirectory)Xamarin.Windows.Build.Tasks\bin\Release\Mono.Cecil.Mdb.dll" DestinationFolder="$(XamarinWindowsMSBuildPath)"/>
-
   </Target>
 
 </Project>

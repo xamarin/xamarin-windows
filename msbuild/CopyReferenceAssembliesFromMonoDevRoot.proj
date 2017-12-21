@@ -6,12 +6,12 @@
   <PropertyGroup>
     <TargetFrameworkName Condition="'$(TargetFrameworkName)' == ''">Xamarin.Windows</TargetFrameworkName>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v1.0</TargetFrameworkVersion>
-    <ReferenceAssembliesPath Condition="'$(ReferenceAssembliesPath)' == ''">C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework</ReferenceAssembliesPath>  
+    <ReferenceAssembliesInstallPath Condition="'$(ReferenceAssembliesInstallPath)' == ''">$(MSBuildThisFileDirectory)..\build\ReferenceAssemblies</ReferenceAssembliesInstallPath>  
     <BclProfile Condition="'$(BclProfile)' == ''">winaot</BclProfile>
     <FrameworkListFilePath Condition="'$(FrameworkListFilePath)' == ''">$(MSBuildThisFileDirectory)\FrameworkList.xml</FrameworkListFilePath>
-    <_TargetPath>$(ReferenceAssembliesPath)\$(TargetFrameworkName)\$(TargetFrameworkVersion)</_TargetPath>
+    <_TargetPath>$(ReferenceAssembliesInstallPath)\$(TargetFrameworkName)\$(TargetFrameworkVersion)</_TargetPath>
     <_BclSourcePath>$(MonoDevRoot)\mcs\class\lib\$(BclProfile)</_BclSourcePath>
-  </PropertyGroup>  
+  </PropertyGroup>
 
   <Target Name="Build" DependsOnTargets="ValidateMonoDevRoot">
     <Error Text="The BCL source directory '$(_BclSourcePath)' does not exist." Condition="!Exists('$(_BclSourcePath)')"/>

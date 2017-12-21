@@ -25,10 +25,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).Before.targets" 
           Condition="Exists('$(MSBuildThisFileDirectory)$(MSBuildThisFileName).Before.targets')"/>
 
-  <!-- TargetFrameworkIdentifier/TargetFrameworkVersion need to be set before Microsoft.CSharp.Targets is imported -->
   <PropertyGroup>
+    <!-- TargetFrameworkIdentifier/TargetFrameworkVersion need to be set before Microsoft.CSharp.Targets is imported -->
     <TargetFrameworkIdentifier>Xamarin.Windows</TargetFrameworkIdentifier>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v1.0</TargetFrameworkVersion>
+
+    <!-- Until VS2017+ includes its own ReferenceAssemblies outside of C:\Program Files (x86)\Reference Assemblies and into 
+        the VsInstallRoot, we must override this ourselves for our SDKs -->
+    <TargetFrameworkRootPath Condition="'$(VsInstallRoot)' != '' And '$(TargetFrameworkRootPath)' == ''">$(VsInstallRoot)\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\</TargetFrameworkRootPath>
+    <TargetFrameworkRootPath Condition="'$(VsInstallRoot)' == '' And '$(TargetFrameworkRootPath)' == ''">$(ProgramFiles)\Reference Assemblies\Microsoft\Framework\</TargetFrameworkRootPath>
   </PropertyGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
