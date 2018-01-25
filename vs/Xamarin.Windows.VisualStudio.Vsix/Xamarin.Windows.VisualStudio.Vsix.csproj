@@ -71,6 +71,7 @@
     <Compile Include="XamarinWindowsDebuggerSession.cs" />
     <Compile Include="XamarinWindowsStartInfo.cs" />
     <Compile Include="XamarinWindowsPackage.cs" />
+    <Compile Include="XamarinWindowsDebugLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />

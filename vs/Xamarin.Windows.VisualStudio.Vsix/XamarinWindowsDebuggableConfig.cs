@@ -42,7 +42,7 @@ namespace Xamarin.Windows
             var startInfo = new XamarinWindowsStartInfo(startArgs, null, baseProject);
             var session = new XamarinWindowsDebuggerSession();
 
-            var launcher = new MonoDebuggerLauncher(new Progress<string>());
+            var launcher = new MonoDebuggerLauncher(new Progress<string>(), new XamarinWindowsDebugLauncher());
 
             launcher.StartSession(startInfo, session);
 
