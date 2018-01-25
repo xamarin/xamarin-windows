@@ -10,12 +10,12 @@ using System.Net;
 
 namespace Xamarin.Windows
 {
-    internal class MonoWindowsDebuggableConfig : IVsDebuggableProjectCfg, IVsProjectFlavorCfg
+    internal class XamarinWindowsDebuggableConfig : IVsDebuggableProjectCfg, IVsProjectFlavorCfg
     {
         private IVsProjectFlavorCfg baseProjectCfg;
         private Project baseProject;
 
-        public MonoWindowsDebuggableConfig(IVsProjectFlavorCfg pBaseProjectCfg, EnvDTE.Project project)
+        public XamarinWindowsDebuggableConfig(IVsProjectFlavorCfg pBaseProjectCfg, EnvDTE.Project project)
         {
             this.baseProject = project;
             this.baseProjectCfg = pBaseProjectCfg;
@@ -39,8 +39,8 @@ namespace Xamarin.Windows
 
             var startArgs = new SoftDebuggerListenArgs(baseProject.Name, IPAddress.Loopback, port);
 
-            var startInfo = new WindowsStartInfo(startArgs, null, baseProject);
-            var session = new WindowsDebuggerSession();
+            var startInfo = new XamarinWindowsStartInfo(startArgs, null, baseProject);
+            var session = new XamarinWindowsDebuggerSession();
 
             var launcher = new MonoDebuggerLauncher(new Progress<string>());
 

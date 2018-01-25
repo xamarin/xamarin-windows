@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Setup.Configuration;
 
 namespace Xamarin.Windows
 {
-    class WindowsDebuggerSession : SoftDebuggerSession
+    class XamarinWindowsDebuggerSession : SoftDebuggerSession
     {
         // The GUID of Microsoft.VisualStudio.Setup.Configuration.SetupConfigurationClass
         private readonly Guid SetupConfigurationClassGuid = new Guid("177F0C4A-1CD3-4DE7-A32C-71DBBB9FA36D");

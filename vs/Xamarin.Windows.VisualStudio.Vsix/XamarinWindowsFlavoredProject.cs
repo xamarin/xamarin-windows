@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 
 namespace Xamarin.Windows
 {
-    internal class MonoWindowsFlavoredProject : FlavoredProjectBase, IVsProjectFlavorCfgProvider
+    internal class XamarinWindowsFlavoredProject : FlavoredProjectBase, IVsProjectFlavorCfgProvider
     {
         private IVsProjectFlavorCfgProvider innerFlavorConfig;
         private XamarinWindowsPackage package;
 
-        public MonoWindowsFlavoredProject(XamarinWindowsPackage package)
+        public XamarinWindowsFlavoredProject(XamarinWindowsPackage package)
         {
             this.package = package;
         }
@@ -29,7 +29,7 @@ namespace Xamarin.Windows
                 GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out project);
 
                 this.innerFlavorConfig.CreateProjectFlavorCfg(pBaseProjectCfg, out cfg);
-                ppFlavorCfg = new MonoWindowsDebuggableConfig(cfg, project as EnvDTE.Project);
+                ppFlavorCfg = new XamarinWindowsDebuggableConfig(cfg, project as EnvDTE.Project);
             }
 
             if (ppFlavorCfg != null)

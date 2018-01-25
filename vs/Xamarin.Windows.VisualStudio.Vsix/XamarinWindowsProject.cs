@@ -8,19 +8,19 @@ using Microsoft.VisualStudio.Shell.Flavor;
 namespace Xamarin.Windows
 {
     [ComVisible(false)]
-    [Guid(XamarinWindowsPackage.MonoWindowsProjectGuid)]
-    public class MonoWindowsProjectFactory : FlavoredProjectFactoryBase
+    [Guid(XamarinWindowsPackage.XamarinWindowsProjectGuid)]
+    public class XamarinWindowsProjectFactory : FlavoredProjectFactoryBase
     {
         private XamarinWindowsPackage package;
 
-        public MonoWindowsProjectFactory(XamarinWindowsPackage package)
+        public XamarinWindowsProjectFactory(XamarinWindowsPackage package)
         {
             this.package = package;
         }
 
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
-            return new MonoWindowsFlavoredProject(package);
+            return new XamarinWindowsFlavoredProject(package);
         }
     }
 

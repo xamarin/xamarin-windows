@@ -39,7 +39,7 @@ namespace Xamarin.Windows
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
     [Guid(XamarinWindowsPackage.PackageGuidString)]
-    [ProvideProjectFactory(typeof (MonoWindowsProjectFactory), "Xamarin.Windows", null, null, null, null, LanguageVsTemplate = "CSharp", TemplateGroupIDsVsTemplate = "Xamarin.Windows")]
+    [ProvideProjectFactory(typeof (XamarinWindowsProjectFactory), "Xamarin.Windows", null, null, null, null, LanguageVsTemplate = "CSharp", TemplateGroupIDsVsTemplate = "Xamarin.Windows")]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class XamarinWindowsPackage : Package
     {
@@ -47,7 +47,7 @@ namespace Xamarin.Windows
         /// XamarinWindowsPackage GUID string.
         /// </summary>
         public const string PackageGuidString = "0610d5ad-36f3-4a90-a0ba-55736bf813ba";
-        public const string MonoWindowsProjectGuid = "8F3E2DF0-C35C-4265-82FC-BEA011F4A7ED";
+        public const string XamarinWindowsProjectGuid = "8F3E2DF0-C35C-4265-82FC-BEA011F4A7ED";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XamarinWindowsPackage"/> class.
@@ -70,7 +70,7 @@ namespace Xamarin.Windows
         {
             base.Initialize();
 
-            RegisterProjectFactory(new MonoWindowsProjectFactory(this));
+            RegisterProjectFactory(new XamarinWindowsProjectFactory(this));
 
             DebuggerLoggingService.CustomLogger = new NullLogger();
         }
