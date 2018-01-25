@@ -36,8 +36,10 @@ echo Found experimental instance dir '%EXP_DIR%'
 set EXT_BASE_DIR=%EXP_DIR%\Extensions\Xamarin\%EXT_NAME%
 
 for /D %%F IN ("%EXT_BASE_DIR%"\*) do (
- set EXT_DIR=%%F
- goto version_found
+	if exist %%F\extension.vsixmanifest (
+    set EXT_DIR=%%F
+    goto version_found
+  )
 )
 echo No '%EXT_NAME%' extension found in '%EXT_BASE_DIR%'
 exit /B 1
