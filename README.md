@@ -112,14 +112,19 @@ At this time VS extensions with embedded MSBuild files or Reference Assemblies
 are not properly deployed to the experimental instance. We need to setup
 symbolic linkes to make sure the VS process correctly loads the MSBuild and
 Reference Assemblies from the `$MSBuild` and `$ReferenceAssemblies` folders
-located inside the extension folder in the experimental instance folder:
+located inside the extension folder in the experimental instance folder. The
+`mk-vs-experimental-links.bat` script in the root of the source tree creates
+these links (must be run as Administrator):
 
 ```
-mklink /D "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\Xamarin\Windows" "%USERPROFILE%\AppData\Local\Microsoft\VisualStudio\15.0_485e8a4fExp\Extensions\Xamarin\Xamarin SDK for Windows\<version>\$MSBuild\Xamarin\Windows"
-mklink /D "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\Xamarin.Windows" "%USERPROFILE%\AppData\Local\Microsoft\VisualStudio\15.0_485e8a4fExp\Extensions\Xamarin\Xamarin SDK for Windows\<version>\$ReferenceAssemblies\Microsoft\Framework\Xamarin.Windows"
+cd C:\xw
+mk-vs-experimental-links.bat
 ```
 
-It should now be possible to debug the extension in VS.
+It should now be possible to debug the extension in VS. **NOTE!** These links
+have to be recreated whenever the VS extension's verison number changes. The
+version number is based on the number of commits so make sure to run the
+script after new files have been committed or pulled.
 
 
 # Converting an ordinary C# project to a Xamarin.Windows project
