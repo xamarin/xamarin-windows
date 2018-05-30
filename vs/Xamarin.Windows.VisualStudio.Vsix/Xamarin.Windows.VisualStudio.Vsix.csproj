@@ -96,36 +96,33 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Clide" Version="2.5.11" TargetFramework="net452" />
+    <MSBuild Include="..\..\msbuild\Xamarin.Windows.Build.Tasks\bin\$(Configuration)\Mono.Cecil.dll">
+      <Link>MSBuild\Xamarin\Windows\Mono.Cecil.dll</Link>
+      <VSIXSubPath>Xamarin\Windows</VSIXSubPath>
+    </MSBuild>
+    <MSBuild Include="..\..\msbuild\Xamarin.Windows.Build.Tasks\bin\$(Configuration)\Mono.Cecil.Mdb.dll">
+      <Link>MSBuild\Xamarin\Windows\Mono.Cecil.Mdb.dll</Link>
+      <VSIXSubPath>Xamarin\Windows</VSIXSubPath>
+    </MSBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Clide" Version="3.1.6" TargetFramework="net452" />
     <PackageReference Include="GitInfo" Version="1.1.48" TargetFramework="net452" DevelopmentDependency="true" />
-    <PackageReference Include="Microsoft.VisualStudio.Imaging" Version="14.3.25407" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" Version="7.10.6070" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.15.103" TargetFramework="net452" DevelopmentDependency="true" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.14.0" Version="14.3.25407" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" Version="10.0.30319" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" Version="11.0.50727" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Immutable.12.0" Version="12.0.21003" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Immutable.14.0" Version="14.3.25407" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop" Version="7.10.6071" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0" Version="10.0.30319" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" Version="11.0.61030" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.12.0" Version="12.0.30110" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.8.0" Version="8.0.50727" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.9.0" Version="9.0.30729" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.TextManager.Interop" Version="7.10.6070" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.TextManager.Interop.8.0" Version="8.0.50727" TargetFramework="net452" />
+    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" Version="7.10.6071" TargetFramework="net452" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.0.0" TargetFramework="net452" />
+    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" EmbedInteropTypes="True"/>
     <PackageReference Include="Microsoft.VisualStudio.Threading" Version="14.1.111" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Utilities" Version="14.3.25407" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="14.1.111" TargetFramework="net452" />
-    <PackageReference Include="Mono.Debugging.VisualStudio" Version="4.9.10-pre" TargetFramework="net452" />
-    <PackageReference Include="MSBuilder" Version="0.1.1" TargetFramework="net452" developmentDependency="true" />
+    <PackageReference Include="Mono.Debugging.VisualStudio" Version="4.10.5-pre" TargetFramework="net452" />
+    <PackageReference Include="MSBuilder" Version="0.1.1" TargetFramework="net452" DevelopmentDependency="true" />
     <PackageReference Include="MSBuilder.CodeTaskAssembly" Version="0.2.5" TargetFramework="net452" DevelopmentDependency="true" />
     <PackageReference Include="MSBuilder.IsXBuild" Version="0.1.0" TargetFramework="net452" />
     <PackageReference Include="MSBuilder.VsixDependency" Version="0.2.16" TargetFramework="net452" />
-    <PackageReference Include="MSBuilder.VsixInstaller" Version="0.2.18" TargetFramework="net452" />
+    <PackageReference Include="MSBuilder.VsixInstaller" Version="1.0.7" TargetFramework="net452" />
     <PackageReference Include="System.Diagnostics.Tracer" Version="2.0.8" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.DTE" Version="7.0.4" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.IDE" Version="7.0.4" TargetFramework="net452" />
+    <PackageReference Include="VSSDK.ComponentModelHost.11" Version="11.0.4" TargetFramework="net452" />
+    <PackageReference Include="VSSDK.Debugger.Interop.11" Version="11.0.4" TargetFramework="net452" />
+    <PackageReference Include="VSSDK.Shell.11" Version="11.0.4" TargetFramework="net452" />
+    <PackageReference Include="VSSDK.VSLangProj.11" Version="11.0.4" TargetFramework="net452" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -159,9 +156,15 @@
   <PropertyGroup>
     <GetVsixSourceItemsDependsOn>
       $(GetVsixSourceItemsDependsOn);
-      AddXamarinWindowsVsixContent
+      AddXamarinWindowsVsixContent;
+      IncludeNuGetResolvedAssets
     </GetVsixSourceItemsDependsOn>
   </PropertyGroup>
+  <Target Name="IncludeNuGetResolvedAssets" DependsOnTargets="ResolveNuGetPackageAssets">
+    <ItemGroup>
+      <VSIXCopyLocalReferenceSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Microsoft.VisualStudio.Setup.Configuration.Interop'" />
+    </ItemGroup>
+  </Target>
   <Target Name="AddXamarinWindowsVsixContent">
     <ItemGroup>
       <Content Include="@(MSBuild)" />

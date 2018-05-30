@@ -5,7 +5,6 @@ using System.Runtime.Remoting;
 using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.VisualStudio.Shell.Interop;
 using Mono.Debugging.Soft;
-using Clide;
 using Microsoft.VisualStudio.Shell;
 using Mono.Debugging.VisualStudio;
 
