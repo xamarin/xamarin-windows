@@ -19,7 +19,7 @@ namespace Xamarin.Windows.Tasks.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -70,19 +70,20 @@ namespace Xamarin.Windows.Tasks.Properties {
         ///// ${BundledAssemblyConfigs}
         ///// ${BundledAssemblyCleanups}
         ///
+        ///#ifndef ROOT_DOMAIN_NAME
+        ///#define ROOT_DOMAIN_NAME &quot;Mono&quot;
+        ///#endif
+        ///
+        ///#ifndef RUNTIME_VERSION
+        ///#define RUNTIME_VERSION NULL
+        ///#endif
+        ///
         ///int mono_launcher_initialize (int argc, char* argv[])
         ///{
-        ///	return mono_launcher_platform_initialize (argc, argv, 
-        ///		GET_AOT_MODULES, GET_BUNDLED_ASSEMBLIES, 
-        ///		GET_BUNDLED_ASSEMBLY_CONFIGS, GET_BUNDLED_ASSEMBLY_CLEANUPS);
-        ///}
-        ///
-        ///int mono_launcher_exec (const char *main_assembly_name)
-        ///{
-        ///	return mono_launcher_platform_exec (main_assembly_name);
-        ///}
-        ///
-        ///void mono_launcher_terminate (v [rest of string was truncated]&quot;;.
+        ///	return mono_launcher_platform_initialize (ROOT_DOMAIN_NAME, RUNTIME_VERSION,
+        ///		argc, argv,
+        ///		GET_AOT_MODULES, GET_BUNDLED_ASSEMBLIES,
+        ///		GET_BUNDLED_ASSEMBLY_CONFIGS, GET_BUNDLED_ASSEMBLY_CLE [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string LauncherTemplate {
             get {
@@ -91,8 +92,25 @@ namespace Xamarin.Windows.Tasks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///.
+        ///   Looks up a localized string similar to #include &lt;stdlib.h&gt;
+        ///
+        ///typedef struct {
+        ///	const char *name;
+        ///	const unsigned char *data;
+        ///	const unsigned int size;
+        ///} MonoBundledAssembly;
+        ///
+        ///typedef struct {
+        ///	const char *name;
+        ///	const char *data;
+        ///} MonoBundledAssemblyConfig;
+        ///
+        ///typedef MonoBundledAssembly *(BundledAssemblyGetter)(void);
+        ///typedef MonoBundledAssemblyConfig *(BundledAssemblyConfigGetter)(void);
+        ///typedef void (BundledAssemblyCleanup) (void);
+        ///
+        ///#define BEGIN_DECLARE_AOT_MODULES                static void *_aot_modules[] = {
+        ///#define DECLARE_AOT_MODULE(symbo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PlatformHeader {
             get {
@@ -101,8 +119,22 @@ namespace Xamarin.Windows.Tasks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///.
+        ///   Looks up a localized string similar to #include &lt;stdint.h&gt;
+        ///
+        ///#include &quot;platform.h&quot;
+        ///
+        ///#define TRUE 1
+        ///#define FALSE 0
+        ///
+        ///typedef int32_t gboolean;
+        ///typedef struct _MonoAssembly MonoAssembly;
+        ///typedef struct _MonoDomain MonoDomain;
+        ///typedef enum { MONO_IMAGE_OK } MonoImageOpenStatus;
+        ///
+        ///extern void mono_jit_set_aot_only (gboolean val);
+        ///extern void mono_aot_register_module (void *aot_info);
+        ///extern void mono_register_bundled_assemblies (const MonoBundledAssembly **assemblies);
+        ///extern void mono_register_config_for_assembly (const char* assembly_name, const cha [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PlatformImpl {
             get {

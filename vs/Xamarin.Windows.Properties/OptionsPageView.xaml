@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Xamarin.Windows.Properties.OptionsPageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Xamarin.Windows.Properties"
+             xmlns:res="clr-namespace:Xamarin.Windows.Properties.Properties"
+             xmlns:Properties="clr-namespace:Xamarin.Windows.Properties"
+			 Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Auto">
+
+        <Grid x:Name="RootGrid" Margin="0,15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Row="0" Grid.Column="1" >
+                <RadioButton Content="{x:Static res:Resources.JitMode}" 
+								     AutomationProperties.Name="{x:Static res:Resources.JitModePropertyName}" 
+								     DockPanel.Dock="Top" 
+								     GroupName="CompilationMode" 
+								     IsChecked="{Binding EnableJitMode}" />
+            </DockPanel>
+            <DockPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" >
+                <RadioButton Content="{x:Static res:Resources.AotMode}" 
+								     AutomationProperties.Name="{x:Static res:Resources.AotModePropertyName}" 
+								     DockPanel.Dock="Top" 
+								     GroupName="CompilationMode" 
+								     IsChecked="{Binding EnableAotMode}"/>
+            </DockPanel>
+            <StackPanel Grid.Row="2" Grid.Column="1" Margin="20,10,0,0">
+                <CheckBox Content="{x:Static res:Resources.GenerateDebuggableAotModules}" 
+						  IsChecked="{Binding GenerateDebuggableAotModules}" IsEnabled="{Binding !EnableJitMode}" Margin="0,0,0,10"  />
+                <CheckBox Content="{x:Static res:Resources.BundleAssemblies}" 
+						  IsChecked="{Binding BundleAssemblies}" IsEnabled="{Binding !EnableJitMode}" Margin="0,0,0,10"  />
+
+                <TextBlock Text="{x:Static res:Resources.AdditionalAotOptions}" />
+                <TextBox Text="{Binding AdditionalAotOptions}" Margin="0,0,-248,0" IsEnabled="{Binding !EnableJitMode}"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

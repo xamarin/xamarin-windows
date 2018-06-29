@@ -10,13 +10,17 @@
     </Installation>
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+        <Dependency d:Source="Installed" Id="Microsoft.VisualStudio.MPF.15.0" DisplayName="Visual Studio MPF 15.0" Version="[15.0,16.0)" />
     </Dependencies>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:TargetPath="|Xamarin.Windows.VisualStudio.Templates;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="Xamarin.Windows.Properties.pkgdef" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Xamarin.Windows.Properties.dll" />
+
     </Assets>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
         <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[15.0,16.0)" DisplayName="C# and Visual Basic" />
-        <Prerequisite Id="Microsoft.VisualStudio.Xamarin.MonoDebugging" Version="[1.0,)" DisplayName="Microsoft.VisualStudio.Xamarin.MonoDebugging" />
+        <Prerequisite Id="Microsoft.VisualStudio.Xamarin.MonoDebugging" Version="[4.6,)" DisplayName="Microsoft.VisualStudio.Component.MonoDebugger" />
     </Prerequisites>
 </PackageManifest>
