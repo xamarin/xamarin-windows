@@ -5,11 +5,20 @@ namespace Xamarin.Windows.Properties
 {
     public class OptionsPageViewModel : ViewModelBase
     {
-        public OptionsPageViewModel() {
-            EnableJitMode = true;
+        public string AdditionalAotArguments {
+            get { return GetPropertyValue<string>(); }
+            set { SetPropertyValue<string>(value); }
         }
 
-        public string AdditionalAotOptions {
+        public string AdditionalMonoOptions {
+            get { return GetPropertyValue<string>(); }
+            set { SetPropertyValue<string>(value); }
+        }
+        public string MonoLogLevel {
+            get { return GetPropertyValue<string>(); }
+            set { SetPropertyValue<string>(value); }
+        }
+        public string MonoLogMask {
             get { return GetPropertyValue<string>(); }
             set { SetPropertyValue<string>(value); }
         }
@@ -24,14 +33,9 @@ namespace Xamarin.Windows.Properties
             set { SetPropertyValue<bool>(value); }
         }
 
-        public bool EnableJitMode {
+        public bool EnableAotMode {
             get { return GetPropertyValue<bool>(); }
             set { SetPropertyValue<bool>(value); }
-        }
-
-        public bool EnableAotMode {
-            get { return !EnableJitMode; }
-            set { EnableJitMode = !value; }
         }
  
     }

@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+int mono_main (int argc, char* argv[]);
+
 #include <stdlib.h>
 
 typedef struct {

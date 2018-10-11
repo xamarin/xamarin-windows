@@ -120,6 +120,12 @@
   <data name="AdditionalAotOptions" xml:space="preserve">
     <value>Additional AOT Options</value>
   </data>
+  <data name="AdditionalMonoOptions" xml:space="preserve">
+    <value>Mono Command Line Options</value>
+  </data>
+  <data name="AdditionalMonoOptionsHelpText" xml:space="preserve">
+    <value>Arguments --debug --debugger-agent=transport=dt_socket,address=127.0.0.1:&lt;port&gt; will be added automatically.</value>
+  </data>
   <data name="AotMode" xml:space="preserve">
     <value>AOT Compilation</value>
   </data>
@@ -138,7 +144,19 @@
   <data name="JitModePropertyName" xml:space="preserve">
     <value>JIT Compilation Enabled</value>
   </data>
+  <data name="MonoLoggingHelpText" xml:space="preserve">
+    <value>More info about</value>
+  </data>
+  <data name="MonoLoggingLinkHelpText" xml:space="preserve">
+    <value>Logging Mono Runtime Events</value>
+  </data>
+  <data name="MonoLogLevel" xml:space="preserve">
+    <value>Mono trace level (MONO_LOG_LEVEL)</value>
+  </data>
+  <data name="MonoLogMask" xml:space="preserve">
+    <value>Mono trace filters (MONO_LOG_MASK)</value>
+  </data>
   <data name="OptionsTitle" xml:space="preserve">
-    <value>Xamarin Build</value>
+    <value>Xamarin</value>
   </data>
 </root>

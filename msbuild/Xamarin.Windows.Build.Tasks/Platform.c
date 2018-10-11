@@ -50,8 +50,6 @@ int mono_launcher_platform_initialize (
 
 	mono_jit_set_aot_only (TRUE);
 
-	mono_jit_init_version (root_domain_name, runtime_version);
-
 	initialized = 1;
 	return 1;
 }

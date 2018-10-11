@@ -39,6 +39,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Defaults -->
   <PropertyGroup>
     <OverrideTargetFramework>false</OverrideTargetFramework>
+    <EnableAotMode Condition="'$(EnableAotMode)' == ''">False</EnableAotMode>
+    <GenerateDebuggableAotModules Condition=" '$(GenerateDebuggableAotModules)' == '' ">True</GenerateDebuggableAotModules>
+    <BundleAssemblies Condition=" '$(BundleAssemblies)' == '' ">False</BundleAssemblies>
+    <AotOutputFileType Condition="'$(AotOutputFileType)' == ''"></AotOutputFileType> <!-- Aot task defaults to Obj -->
+    <AotOutputFileExtension Condition="'$(AotOutputFileExtension)' == ''"></AotOutputFileExtension> <!-- Aot task defaults to .obj/.s/.dll depending on AotOutputFileType value -->
     <AssemblySearchPaths>$([System.String]::Copy('$(AssemblySearchPaths)').Replace('{GAC}',''))</AssemblySearchPaths>
     <AssemblySearchPaths Condition="'$(MSBuildRuntimeVersion)' != ''">$(AssemblySearchPaths.Split(';'))</AssemblySearchPaths>
     <TargetFrameworkIdentifier>Xamarin.Windows</TargetFrameworkIdentifier>
@@ -61,16 +66,26 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
   <!-- Directories and files -->
   <PropertyGroup>
+
+    <_XWAot Condition="$(GenerateDebuggableAotModules) == true">Aotd</_XWAot>
+    <_XWAot Condition="$(GenerateDebuggableAotModules) == false">Aot</_XWAot>
     <_XWIntermediateOutputPath>$(IntermediateOutputPath)XW\</_XWIntermediateOutputPath>
-    <_XWAotOutputDirectory>$(_XWIntermediateOutputPath)Aot\</_XWAotOutputDirectory>
-    <_XWGeneratedCodeOutputDirectory>$(_XWIntermediateOutputPath)Gen\</_XWGeneratedCodeOutputDirectory>
-    <_XWIntermediateAssembliesDirectory>$(_XWIntermediateOutputPath)Assem\</_XWIntermediateAssembliesDirectory>
-    <_XWIntermediateNativeOutputDirectory>$(_XWIntermediateOutputPath)Native\</_XWIntermediateNativeOutputDirectory>
-    <_XWNativeExeOutputDirectory>$(OutputPath)Native\</_XWNativeExeOutputDirectory>
-    <_XWNativeProjectName>$(TargetName)</_XWNativeProjectName>
-    <_XWNativeProjectFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).vcxproj</_XWNativeProjectFile>
-    <_XWNativeProjectPropsFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).props</_XWNativeProjectPropsFile>
-    <_XWExtractedItemsFile>$(_XWIntermediateOutputPath)$(_XWNativeProjectName).items</_XWExtractedItemsFile>
+    <_XWIntermediateOutputDirectory Condition="$(EnableAotMode) == true">$(_XWIntermediateOutputPath)$(_XWAot)\</_XWIntermediateOutputDirectory>
+    <_XWIntermediateOutputDirectory Condition="$(EnableAotMode) == false" >$(_XWIntermediateOutputPath)Jit\</_XWIntermediateOutputDirectory>
+    <_XWOutputPath Condition="$(EnableAotMode) == true">$(OutputPath)$(_XWAot)\</_XWOutputPath>
+    <_XWOutputPath Condition="$(EnableAotMode) == false" >$(OutputPath)Jit\</_XWOutputPath>
+    <_XWIntermediateOutputPath Condition="'$(XamarinWindowsIntermediateOutputPath)' != ''">$(XamarinWindowsIntermediateOutputPath)</_XWIntermediateOutputPath>
+    <_XWIntermediateOutputDirectory Condition="'$(XamarinWindowsIntermediateOutputPath)' != ''">$(XamarinWindowsIntermediateOutputPath)</_XWIntermediateOutputDirectory>
+    <_XWOutputPath Condition="'$(XamarinWindowsOutputPath)' != ''">$(XamarinWindowsOutputPath)</_XWOutputPath>
+    <_XWGeneratedCodeOutputDirectory>$(_XWIntermediateOutputDirectory)Gen\</_XWGeneratedCodeOutputDirectory>
+    <_XWIntermediateAssembliesDirectory>$(_XWIntermediateOutputDirectory)Assem\</_XWIntermediateAssembliesDirectory>
+
+    <_XWIntermediateNativeOutputDirectory>$(_XWIntermediateOutputPath)\</_XWIntermediateNativeOutputDirectory>
+    <_XWNativeExeOutputDirectory>$(_XWOutputPath)\</_XWNativeExeOutputDirectory>
+    <_XWNativeProjectName>__$(TargetName)</_XWNativeProjectName>
+    <_XWNativeProjectFile>$(_XWIntermediateOutputDirectory)$(_XWNativeProjectName).vcxproj</_XWNativeProjectFile>
+    <_XWNativeProjectPropsFile>$(_XWIntermediateOutputDirectory)$(_XWNativeProjectName).props</_XWNativeProjectPropsFile>
+    <_XWExtractedItemsFile>$(_XWIntermediateOutputDirectory)$(_XWNativeProjectName).items</_XWExtractedItemsFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -119,19 +134,39 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </CleanDependsOn>
   </PropertyGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="$(EnableAotMode) == false">
     <BuildDependsOn>
+      _InitializeXamarinWindowsBuildStatus;
       $(BuildDependsOn);
       _ConvertPdbFiles;
+      _FinalizeXamarinWindowsBuildStatus;
     </BuildDependsOn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OutputType)' == 'Exe'">
-    <BuildNativeDependsOn>
-      Build;
-      BuildNative;
-    </BuildNativeDependsOn>
+  <PropertyGroup Condition="$(EnableAotMode) == true">
+    <BuildDependsOn>
+      _InitializeXamarinWindowsBuildStatus;
+      $(BuildDependsOn);
+      _ConvertPdbFiles;
+      _BuildNative;
+      _FinalizeXamarinWindowsBuildStatus;
+    </BuildDependsOn>
   </PropertyGroup>
+
+  <Target Name="_PrintXamarinWindowsProductVersion">
+    <Message Importance="high" Text="Using Xamarin SDK for Windows version $(XamarinWindowsFullVersion) built at $(XamarinWindowsBuildTimestamp)"
+             Condition="'$(XamarinWindowsFullVersion)' != ''"/>
+  </Target>
+
+  <Target Name="_InitializeXamarinWindowsBuildStatus">
+    <CallTarget Targets="Clean" Condition="Exists('$(_XWIntermediateOutputDirectory)unsuccessfulbuild')"/>
+    <MakeDir Directories="$(_XWIntermediateOutputDirectory)" />
+    <Touch AlwaysCreate="true" Files="$(_XWIntermediateOutputDirectory)unsuccessfulbuild"/>
+  </Target>
+
+  <Target Name="_FinalizeXamarinWindowsBuildStatus">
+    <Delete Files="$(_XWIntermediateOutputDirectory)unsuccessfulbuild" Condition="Exists('$(_XWIntermediateOutputDirectory)unsuccessfulbuild')"/>
+  </Target>
 
   <!-- Microsoft.CSharp.Targets adds the .NET mscorlib.dll to _ExplicitReference.
        Here we remove it and make sure @(Reference) contains mscorlib instead. -->
@@ -201,29 +236,48 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Aot AotCompilerPath="$(AotCompilerPath)"
          NativeToolchainPaths="$(NativeToolchainPaths)" NativeToolsPrefix="$(NativeToolsPrefix)" NativeLinkerFlags="$(NativeLinkerFlags)"
          ResolvedFrameworkAssemblies="@(CollectedFrameworkAssemblies)" ResolvedUserAssemblies="@(CollectedUserAssemblies)"
-         AotOutputDirectory="$(_XWAotOutputDirectory)" 
-         IntermediateAssemblyDirectory="$(_XWIntermediateAssembliesDirectory)" IsDebug="$(GenerateDebuggableAotModules)" 
-         GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)">
+         AotOutputDirectory="$(_XWIntermediateOutputDirectory)"
+         IntermediateAssemblyDirectory="$(_XWIntermediateAssembliesDirectory)" IsDebug="$(GenerateDebuggableAotModules)"
+         GenerateNativeDebugInfo="$(GenerateNativeDebugInfo)" OutputFileType="$(AotOutputFileType)" OutputFileExtension="$(AotOutputFileExtension)"
+         PostAdditionalAotArguments="$(AdditionalAotArguments)"
+         OnlyRecompileIfChanged="True">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedAotFiles" />
     </Aot>
   </Target>
 
-  <Target Name="_GenerateLauncher" DependsOnTargets="_CollectAssemblies">
-    <GenerateLauncher AotAssemblies="@(CollectedAssemblies)" BundledAssemblies="@(CollectedAssemblies)"
+  <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_CollectAssemblies" Condition="$(BundleAssemblies) == true">
+    <ItemGroup>
+      <BundledAssemblies Include="@(CollectedAssemblies)"/>
+    </ItemGroup>
+    <GenerateBundledAssemblies Assemblies="@(BundledAssemblies)" ConfigFiles="@(CollectedConfigFiles)" SkipUnchanged="true" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
+      <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
+      <Output TaskParameter="BundledConfigFiles" ItemName="BundledConfigFiles" />
+    </GenerateBundledAssemblies>
+    <ItemGroup>
+      <GeneratedSourceFiles Include="@(_BundledSourceFiles)">
+        <CompileAsWinRT>false</CompileAsWinRT>
+        <WholeProgramOptimization>false</WholeProgramOptimization>
+      </GeneratedSourceFiles>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_GenerateAotLauncher" DependsOnTargets="_CollectAssemblies;_GenerateBundledAssemblies">
+    <GenerateLauncher AotAssemblies="@(CollectedAssemblies)" BundledAssemblies="@(BundledAssemblies)"
         OutputDirectory="$(_XWGeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
         UseCustomPlatformImpl="$(UseCustomPlatformImpl)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
     </GenerateLauncher>
   </Target>
-
-  <Target Name="_GenerateBundledAssemblies" DependsOnTargets="_CollectAssemblies">
-    <GenerateBundledAssemblies Assemblies="@(CollectedAssemblies)" ConfigFiles="@(CollectedConfigFiles)" OutputDirectory="$(_XWGeneratedCodeOutputDirectory)">
+<!--
+  <Target Name="_GenerateLauncher" DependsOnTargets="_CollectAssemblies">
+    <GenerateLauncher AotAssemblies="@(CollectedAssemblies)" BundledAssemblies="@(BundledAssemblies)"
+        OutputDirectory="$(_XWGeneratedCodeOutputDirectory)" LauncherFileName="$(LauncherFileName)"
+        UseCustomPlatformImpl="$(UseCustomPlatformImpl)">
       <Output TaskParameter="GeneratedFiles" ItemName="GeneratedSourceFiles" />
-      <Output TaskParameter="BundledConfigFiles" ItemName="BundledConfigFiles" />
-    </GenerateBundledAssemblies>
+    </GenerateLauncher>
   </Target>
-
-  <Target Name="_PrepareNative" DependsOnTargets="_AotCompileAssemblies;_GenerateLauncher;_GenerateBundledAssemblies">
+-->
+  <Target Name="_PrepareNative" DependsOnTargets="_AotCompileAssemblies;_GenerateAotLauncher">
     <ItemGroup>
       <_ClCompile Include="@(GeneratedSourceFiles)" Condition="'%(Extension)' != '.h'"/>
       <_Object Include="@(GeneratedAotFiles)"/>
@@ -232,22 +286,28 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <_XWAdditionalDependencies>Mswsock.lib%3Bws2_32.lib%3Bole32.lib%3Boleaut32.lib%3Bpsapi.lib%3Bversion.lib%3Badvapi32.lib%3Bwinmm.lib%3Bkernel32.lib%3Blibmonoruntime-sgen.lib%3Beglib.lib%3Blibgcmonosgen.lib%3Blibmono-static-sgen.lib%3Blibmonoutils.lib</_XWAdditionalDependencies>
       <_XWAdditionalLibraryDirectories>$(MonoLibsPath)</_XWAdditionalLibraryDirectories>
     </PropertyGroup>
-    <ItemGroup>
+    <ItemGroup Condition="$(BundleAssemblies) == false">
       <_None Include="@(CollectedAssemblies)">
         <Link>%(Filename)%(Extension)</Link>
         <DeploymentContent>true</DeploymentContent>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </_None>
+    </ItemGroup>
+    <ItemGroup Condition="$(EnableAotMode) == false or $(GenerateDebuggableAotModules) == true">
       <_None Include="@(CollectedMdbFiles)">
         <Link>%(Filename)%(Extension)</Link>
         <DeploymentContent>true</DeploymentContent>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </_None>
       <_None Include="@(ConvertedMdbFiles)">
         <Link>%(Filename)%(Extension)</Link>
         <DeploymentContent>true</DeploymentContent>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </_None>
       <_None Include="@(CollectedPPdbFiles)">
         <Link>%(Filename)%(Extension)</Link>
         <DeploymentContent>true</DeploymentContent>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </_None>
     </ItemGroup>
     <Delete Files="$(_XWExtractedItemsFile)" Condition="Exists('$(_XWExtractedItemsFile)')"/>  
@@ -268,7 +328,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <_XWNativeProjectPropsLines Include="    &lt;OutDir&gt;$(_XWCurrentDir)$(_XWNativeExeOutputDirectory)&lt;/OutDir&gt;"/>
       <_XWNativeProjectPropsLines Include="    &lt;IntDir&gt;$(_XWCurrentDir)$(_XWIntermediateNativeOutputDirectory)&lt;/IntDir&gt;"/>
       <_XWNativeProjectPropsLines Include="    &lt;XWAdditionalDependencies&gt;$(_XWAdditionalDependencies)&lt;/XWAdditionalDependencies&gt;"/>
-      <_XWNativeProjectPropsLines Include="    &lt;XWBuildConfiguration&gt;$(NativeBuildConfiguration)&lt;/XWBuildConfiguration&gt;"/>
+      <_XWNativeProjectPropsLines Include="    &lt;NativeBuildConfiguration&gt;$(NativeBuildConfiguration)&lt;/NativeBuildConfiguration&gt;"/>
       <_XWNativeProjectPropsLines Include="  &lt;/PropertyGroup&gt;"/>
       <_XWNativeProjectPropsLines Include="  &lt;ItemDefinitionGroup&gt;"/>
       <_XWNativeProjectPropsLines Include="    &lt;Link&gt;"/>
@@ -285,7 +345,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Target Name="BuildNative" DependsOnTargets="$(BuildNativeDependsOn)"/> 
 
   <Target Name="_CleanXamarinWindowsOutputs">
-    <RemoveDir Directories="$(_XWIntermediateOutputPath);$(_XWNativeExeOutputDirectory)" />  
+    <RemoveDir Directories="$(_XWIntermediateOutputPath);$(_XWNativeExeOutputDirectory)" ContinueOnError="true"/>
   </Target>
 
   <!--

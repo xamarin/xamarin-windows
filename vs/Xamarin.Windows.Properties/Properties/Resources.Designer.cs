@@ -70,6 +70,24 @@ namespace Xamarin.Windows.Properties.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mono Command Line Options.
+        /// </summary>
+        public static string AdditionalMonoOptions {
+            get {
+                return ResourceManager.GetString("AdditionalMonoOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments --debug --debugger-agent=transport=dt_socket,address=127.0.0.1:&lt;port&gt; will be added automatically..
+        /// </summary>
+        public static string AdditionalMonoOptionsHelpText {
+            get {
+                return ResourceManager.GetString("AdditionalMonoOptionsHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to AOT Compilation.
         /// </summary>
         public static string AotMode {
@@ -124,7 +142,43 @@ namespace Xamarin.Windows.Properties.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Xamarin Build.
+        ///   Looks up a localized string similar to More info about.
+        /// </summary>
+        public static string MonoLoggingHelpText {
+            get {
+                return ResourceManager.GetString("MonoLoggingHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logging Mono Runtime Events.
+        /// </summary>
+        public static string MonoLoggingLinkHelpText {
+            get {
+                return ResourceManager.GetString("MonoLoggingLinkHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mono trace level (MONO_LOG_LEVEL).
+        /// </summary>
+        public static string MonoLogLevel {
+            get {
+                return ResourceManager.GetString("MonoLogLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mono trace filters (MONO_LOG_MASK).
+        /// </summary>
+        public static string MonoLogMask {
+            get {
+                return ResourceManager.GetString("MonoLogMask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xamarin.
         /// </summary>
         public static string OptionsTitle {
             get {

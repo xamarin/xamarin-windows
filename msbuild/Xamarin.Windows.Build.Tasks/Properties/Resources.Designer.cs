@@ -92,7 +92,9 @@ namespace Xamarin.Windows.Tasks.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to #include &lt;stdlib.h&gt;
+        ///   Looks up a localized string similar to int mono_main (int argc, char* argv[]);
+        ///
+        ///#include &lt;stdlib.h&gt;
         ///
         ///typedef struct {
         ///	const char *name;
@@ -109,8 +111,7 @@ namespace Xamarin.Windows.Tasks.Properties {
         ///typedef MonoBundledAssemblyConfig *(BundledAssemblyConfigGetter)(void);
         ///typedef void (BundledAssemblyCleanup) (void);
         ///
-        ///#define BEGIN_DECLARE_AOT_MODULES                static void *_aot_modules[] = {
-        ///#define DECLARE_AOT_MODULE(symbo [rest of string was truncated]&quot;;.
+        ///#define BEGIN_DECLARE_AOT_MODULES                static void *_aot_modul [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PlatformHeader {
             get {

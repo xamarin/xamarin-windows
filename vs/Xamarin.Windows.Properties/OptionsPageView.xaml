@@ -16,33 +16,45 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Row="0" Grid.Column="1" >
-                <RadioButton Content="{x:Static res:Resources.JitMode}" 
-								     AutomationProperties.Name="{x:Static res:Resources.JitModePropertyName}" 
-								     DockPanel.Dock="Top" 
-								     GroupName="CompilationMode" 
-								     IsChecked="{Binding EnableJitMode}" />
-            </DockPanel>
             <DockPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" >
-                <RadioButton Content="{x:Static res:Resources.AotMode}" 
-								     AutomationProperties.Name="{x:Static res:Resources.AotModePropertyName}" 
+                <CheckBox Content="{x:Static res:Resources.AotMode}" 
+								     AutomationProperties.Name="{x:Static res:Resources.AotModePropertyName}"
 								     DockPanel.Dock="Top" 
-								     GroupName="CompilationMode" 
 								     IsChecked="{Binding EnableAotMode}"/>
             </DockPanel>
             <StackPanel Grid.Row="2" Grid.Column="1" Margin="20,10,0,0">
                 <CheckBox Content="{x:Static res:Resources.GenerateDebuggableAotModules}" 
-						  IsChecked="{Binding GenerateDebuggableAotModules}" IsEnabled="{Binding !EnableJitMode}" Margin="0,0,0,10"  />
+						  IsChecked="{Binding GenerateDebuggableAotModules}" IsEnabled="{Binding EnableAotMode}" Margin="0,0,0,10"  />
                 <CheckBox Content="{x:Static res:Resources.BundleAssemblies}" 
-						  IsChecked="{Binding BundleAssemblies}" IsEnabled="{Binding !EnableJitMode}" Margin="0,0,0,10"  />
+						  IsChecked="{Binding BundleAssemblies}" IsEnabled="{Binding EnableAotMode}" Margin="0,0,0,10"  />
 
                 <TextBlock Text="{x:Static res:Resources.AdditionalAotOptions}" />
-                <TextBox Text="{Binding AdditionalAotOptions}" Margin="0,0,-248,0" IsEnabled="{Binding !EnableJitMode}"/>
+                <TextBox Text="{Binding AdditionalAotArguments}" IsEnabled="{Binding EnableAotMode}" Margin="0,0,-248,0"/>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,10,0,0">
+                <TextBlock Text="{x:Static res:Resources.AdditionalMonoOptions}" />
+                <TextBox Text="{Binding AdditionalMonoOptions}" Margin="0,0,-248,0"/>
+                <TextBlock Text="{x:Static res:Resources.AdditionalMonoOptionsHelpText}"/>
+            </StackPanel>
+            <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,10,0,0">
+                <TextBlock Text="{x:Static res:Resources.MonoLogLevel}" />
+                <TextBox Text="{Binding MonoLogLevel}" Margin="0,0,-248,0"/>
+            </StackPanel>
+            <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,10,0,0">
+                <TextBlock Text="{x:Static res:Resources.MonoLogMask}" />
+                <TextBox Text="{Binding MonoLogMask}" Margin="0,0,-248,0"/>
+                <TextBlock>
+                    <TextBlock Text="{x:Static res:Resources.MonoLoggingHelpText}"/>
+                    <Hyperlink NavigateUri="https://www.mono-project.com/docs/advanced/runtime/logging-runtime-events"><TextBlock Text="{x:Static res:Resources.MonoLoggingLinkHelpText}"/></Hyperlink>
+                </TextBlock>
             </StackPanel>
         </Grid>
     </ScrollViewer>
