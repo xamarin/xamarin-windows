@@ -1,4 +1,6 @@
-﻿using EnvDTE;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+using EnvDTE;
 using Mono.Debugging.Soft;
 using Mono.Debugging.VisualStudio;
 

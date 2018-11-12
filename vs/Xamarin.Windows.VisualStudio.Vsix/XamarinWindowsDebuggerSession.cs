@@ -1,4 +1,6 @@
-﻿using Mono.Debugging.Soft;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+using Mono.Debugging.Soft;
 using System;
 using Mono.Debugging.Client;
 using EnvDTE;

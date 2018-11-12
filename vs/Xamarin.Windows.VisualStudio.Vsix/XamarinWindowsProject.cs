@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.Shell.Interop;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+using Microsoft.VisualStudio.Shell.Interop;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.OLE.Interop;
 using System;
