@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using Mono.Debugging.Client;
+using Xamarin.Windows.Properties;
 
 namespace Xamarin.Windows
 {

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\MSBuilder.CodeTaskAssembly.0.2.5\build\MSBuilder.CodeTaskAssembly.props" Condition="Exists('..\..\packages\MSBuilder.CodeTaskAssembly.0.2.5\build\MSBuilder.CodeTaskAssembly.props')" />
-  <Import Project="..\..\packages\MSBuilder.0.1.1\build\MSBuilder.props" Condition="Exists('..\..\packages\MSBuilder.0.1.1\build\MSBuilder.props')" />
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\..\Xamarin.Windows.props" />
-  <Import Project="..\..\packages\MSBuilder.IsXBuild.0.1.0\build\MSBuilder.IsXBuild.props" Condition="Exists('..\..\packages\MSBuilder.IsXBuild.0.1.0\build\MSBuilder.IsXBuild.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -36,7 +33,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Xamarin.Windows.VisualStudio</RootNamespace>
     <AssemblyName>Xamarin.Windows.VisualStudio</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -65,6 +62,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="XamarinWindowsConstants.cs" />
+    <Compile Include="ProjectExtensions.cs" />
+    <Compile Include="ProjectPackageGuids.cs" />
     <Compile Include="XamarinWindowsDebuggableConfig.cs" />
     <Compile Include="XamarinWindowsFlavoredProject.cs" />
     <Compile Include="XamarinWindowsProject.cs" />
@@ -87,6 +87,12 @@
       <InstallRoot>MSBuild</InstallRoot>
       <VSIXSubPath>Xamarin\Windows</VSIXSubPath>
     </ProjectReference>
+    <ProjectReference Include="..\Xamarin.Windows.Properties\Xamarin.Windows.Properties.csproj">
+      <Project>{7ab90faa-563e-4d2a-ad74-eb626bb07c6e}</Project>
+      <Name>Xamarin.Windows.Properties</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\Xamarin.Windows.VisualStudio.Templates\Xamarin.Windows.VisualStudio.Templates.csproj">
       <Project>{1B6299C6-4703-4FD5-B55E-BC47A4569A02}</Project>
       <Name>Xamarin.Windows.VisualStudio.Templates</Name>
@@ -106,25 +112,23 @@
     </MSBuild>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Clide" Version="3.1.6" TargetFramework="net452" />
+    <PackageReference Include="Clide" Version="3.1.12" TargetFramework="net452" />
     <PackageReference Include="GitInfo" Version="1.1.48" TargetFramework="net452" DevelopmentDependency="true" />
-    <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" Version="7.10.6071" TargetFramework="net452" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="1.0.0" TargetFramework="net452" />
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" EmbedInteropTypes="True"/>
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="14.1.111" TargetFramework="net452" />
-    <PackageReference Include="Mono.Debugging.VisualStudio" Version="4.10.5-pre" TargetFramework="net452" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.VsixSuppression">
+      <Version>14.1.37</Version>
+    </PackageReference>
+    <PackageReference Include="Mono.Debugging.VisualStudio" Version="4.14.8-pre" TargetFramework="net452" />
     <PackageReference Include="MSBuilder" Version="0.1.1" TargetFramework="net452" DevelopmentDependency="true" />
     <PackageReference Include="MSBuilder.CodeTaskAssembly" Version="0.2.5" TargetFramework="net452" DevelopmentDependency="true" />
     <PackageReference Include="MSBuilder.IsXBuild" Version="0.1.0" TargetFramework="net452" />
     <PackageReference Include="MSBuilder.VsixDependency" Version="0.2.16" TargetFramework="net452" />
     <PackageReference Include="MSBuilder.VsixInstaller" Version="1.0.7" TargetFramework="net452" />
     <PackageReference Include="System.Diagnostics.Tracer" Version="2.0.8" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.ComponentModelHost.11" Version="11.0.4" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.Debugger.Interop.11" Version="11.0.4" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.Shell.11" Version="11.0.4" TargetFramework="net452" />
-    <PackageReference Include="VSSDK.VSLangProj.11" Version="11.0.4" TargetFramework="net452" />
+    <PackageReference Include="VSSDK_Reference_Assemblies" Version="15.0.26608" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
   </ItemGroup>
   <Import Project="..\..\build.proj" />
@@ -198,6 +202,25 @@
       <VSIXSubPath>Microsoft/Framework/Xamarin.Windows/v1.0/Facades</VSIXSubPath>
     </ReferenceAssemblies> -->
     <WriteLinesToFile File="ReferenceAssemblies.items" Lines="@(RefAssemItemsLines-&gt;'%(Identity)'-&gt;Replace('==', '  '))" Overwrite="true" Encoding="Unicode" />
+  </Target>
+  <!--
+    ==================================================================================================================
+       Overrrides Generate Pkk Def (filtering the reference path to avoid the "filename or extension is too long" )
+    ==================================================================================================================
+  -->
+  <Target Name="GeneratePkgDef" Inputs="$(TargetPath)" Outputs="$(IntermediateOutputPath)$(TargetName).pkgdef" Condition="'$(GeneratePkgDefFile)'=='true'" DependsOnTargets="$(GeneratePkgDefDependsOn)">
+    <Message Text="Creating intermediate PkgDef file." />
+    <ItemGroup>
+      <_AssembliesToIncludeForBingding Include="@(ReferencePath)" Condition="'%(ReferencePath.ResolvedFrom)' != 'ImplicitlyExpandDesignTimeFacades' and '%(ReferencePath.FrameworkFile)' != 'true'" />
+    </ItemGroup>
+    <CreatePkgDef AssemblyToProcess="$(TargetPath)" ProductVersion="$(TargetVSVersion)" OutputFile="$(IntermediateOutputPath)$(TargetName).latest.pkgdef" UseCodebase="$(UseCodebase)" ReferencedAssemblies="@(_AssembliesToIncludeForBingding)" />
+    <CopyIfChanged Condition="Exists('$(IntermediateOutputPath)$(TargetName).latest.pkgdef')" SourceFile="$(IntermediateOutputPath)$(TargetName).latest.pkgdef" DestinationFile="$(IntermediateOutputPath)$(TargetName).pkgdef" />
+    <!-- If the CTO file was changed, touch the pkgdef file to cause a re-merge -->
+    <Touch Files="$(IntermediateOutputPath)$(TargetName).pkgdef" Condition="'$(CTOFileHasChanged)'=='true' AND Exists('$(IntermediateOutputPath)$(TargetName).pkgdef')" />
+    <ItemGroup>
+      <FileWrites Include="$(IntermediateOutputPath)$(TargetName).pkgdef" Condition="Exists('$(IntermediateOutputPath)$(TargetName).pkgdef')" />
+      <FileWrites Include="$(IntermediateOutputPath)$(TargetName).latest.pkgdef" Condition="Exists('$(IntermediateOutputPath)$(TargetName).latest.pkgdef')" />
+    </ItemGroup>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
