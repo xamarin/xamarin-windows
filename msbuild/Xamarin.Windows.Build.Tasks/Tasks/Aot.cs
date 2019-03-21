@@ -40,6 +40,7 @@ namespace Xamarin.Windows.Tasks
 		}
 		public string OutputFileExtension { get; set; }
 		public string Runtime { get; set; }
+		public bool EnableLLVM {get; set; } = false;
 
 		[Required]
 		public ITaskItem[] ResolvedFrameworkAssemblies { get; set; }
@@ -102,19 +103,13 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugMessage("  PostAdditionalAotArguments: {0}", PostAdditionalAotArguments);
 			Log.LogDebugMessage("  IsDebug: {0}", IsDebug);
 			Log.LogDebugMessage("  Runtime: {0}", Runtime);
+			Log.LogDebugMessage("  EnableLLVM: {0}", EnableLLVM);
 			Log.LogDebugMessage("  OnlyRecompileIfChanged: {0}", OnlyRecompileIfChanged);
 			Log.LogDebugMessage("  GenerateNativeDebugInfo: {0}", GenerateNativeDebugInfo);
 			Log.LogDebugMessage("  OutputFileType: {0}", OutputFileType);
 			Log.LogDebugMessage("  OutputFileExtension: {0}", OutputFileExtension);
 			Log.LogDebugTaskItems("  ResolvedFrameworkAssemblies:", ResolvedFrameworkAssemblies);
 			Log.LogDebugTaskItems("  ResolvedUserAssemblies:", ResolvedUserAssemblies);
-
-			if (!File.Exists(Path.Combine(NativeToolchainPaths, "clang.exe"))) {
-				Log.LogError ($"Could not find clang.exe in {NativeToolchainPaths}. "
-							  + "Make sure to select the feature \"Clang with Microsoft Codegen\" in the Visual Studio Installer "
-							  + "under \"Cross Platform Mobile Development\"->\"Visual C++ Mobile Development\".");
-				return false;
-			}
 
 			var outputFiles = new List<string>();
 
@@ -137,13 +132,28 @@ namespace Xamarin.Windows.Tasks
 				}
 
 				var outputFile = Path.Combine(AotOutputDirectory, Path.GetFileName(assembly.ItemSpec) + "." + OutputFileExtension);
+				var outputFileLLVM = Path.Combine(AotOutputDirectory, Path.GetFileName(assembly.ItemSpec) + "-llvm." + OutputFileExtension);
+
 				outputFiles.Add(outputFile);
+				if (EnableLLVM) {
+					outputFiles.Add(outputFileLLVM);
+				}
+
 				var assemblyPath = Path.GetFullPath(assembly.ItemSpec);
 				if (OnlyRecompileIfChanged && File.Exists(outputFile) && File.Exists(assemblyPath) 
 						&& File.GetLastWriteTime(outputFile) >= File.GetLastWriteTime(assemblyPath)) {
-					Log.LogMessage(MessageImportance.High, "  Not recompiling unchanged assembly: {0}", assemblyPath);
-					continue;
+					if (!EnableLLVM && File.Exists(outputFileLLVM)) {
+						Log.LogMessage(MessageImportance.High, "  Found LLVM object file for assembly: {0} during none LLVM build, forcing recompile.", assemblyPath);
+					} else {
+						Log.LogMessage(MessageImportance.High, "  Not recompiling unchanged assembly: {0}", assemblyPath);
+						continue;
+					}
 				}
+
+				if (File.Exists (outputFile))
+					File.Delete (outputFile);
+				if (File.Exists (outputFileLLVM))
+					File.Delete (outputFileLLVM);
 
 				var tempDir = Path.Combine(AotOutputDirectory, Path.GetFileName(assembly.ItemSpec) + ".tmp");
 				if (!Directory.Exists(tempDir))
@@ -155,6 +165,10 @@ namespace Xamarin.Windows.Tasks
 					aotOptions.Add(PreAdditionalAotArguments);
 				}
 				aotOptions.Add("full");
+				if (EnableLLVM) {
+					aotOptions.Add("llvm");
+					aotOptions.Add("llvm-outfile=" + QuoteFileName(outputFileLLVM));
+				}
 				aotOptions.Add("outfile=" + QuoteFileName(outputFile));
 				if (IsDebug && ResolvedUserAssemblies.Contains(assembly)) {
 					aotOptions.Add("soft-debug");
@@ -202,6 +216,26 @@ namespace Xamarin.Windows.Tasks
 
 		bool RunAotCompiler(string aotCompiler, List<string> args, string assembliesPath)
 		{
+			if (!File.Exists(Path.Combine(NativeToolchainPaths, "clang.exe"))) {
+				Log.LogError($"Could not find clang.exe in {NativeToolchainPaths}. "
+							  + "Make sure to select the feature \"Clang with Microsoft Codegen\" in the Visual Studio Installer "
+							  + "under \"Cross Platform Mobile Development\"->\"Visual C++ Mobile Development\".");
+				return false;
+			}
+
+			var crossCompilerPath = Path.GetDirectoryName(aotCompiler);
+			if (EnableLLVM) {
+				if (!File.Exists(Path.Combine(crossCompilerPath, "opt.exe"))) {
+					Log.LogError($"Could not find opt.exe in {crossCompilerPath}.");
+					return false;
+				}
+
+				if (!File.Exists(Path.Combine(crossCompilerPath, "llc.exe"))) {
+					Log.LogError($"Could not find llc.exe in {crossCompilerPath}.");
+					return false;
+				}
+			}
+
 			var psi = new ProcessStartInfo() {
 				FileName = aotCompiler,
 				Arguments = string.Join(" ", args),
@@ -215,7 +249,7 @@ namespace Xamarin.Windows.Tasks
 			// we do not want options to be provided out of band to the cross compilers
 			psi.EnvironmentVariables["MONO_ENV_OPTIONS"] = String.Empty;
 			psi.EnvironmentVariables["MONO_PATH"] = assembliesPath;
-			psi.EnvironmentVariables["PATH"] = NativeToolchainPaths;
+			psi.EnvironmentVariables["PATH"] = NativeToolchainPaths + ";" + crossCompilerPath;
 
 			Log.LogMessage(MessageImportance.High, "    [AOT] PATH=\"{0}\" MONO_PATH=\"{1}\" MONO_ENV_OPTIONS=\"{2}\" {3} {4}",
 				psi.EnvironmentVariables["PATH"],
