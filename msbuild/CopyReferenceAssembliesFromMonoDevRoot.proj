@@ -20,17 +20,22 @@
       <Assemblies Include="$(_BclSourcePath)\*.dll"/>
       <Assemblies Remove="$(_BclSourcePath)\*.dll.dll"/>
       <Assemblies Remove="$(_BclSourcePath)\*nunit*.*"/>
-      <PDBCandidates Include="@(Assemblies->'$(_BclSourcePath)\%(Filename).pdb')"/>
-      <PDBs Include="@(PDBCandidates)" Condition="Exists('%(Identity)')"/>
       <FacadeAssemblies Include="$(_BclSourcePath)\Facades\*.dll"/>
+      <FacadeAssemblies Remove="$(_BclSourcePath)\Facades\*.dll.dll"/>
+      <AssembliesPDBCandidates Include="@(Assemblies->'$(_BclSourcePath)\%(Filename).pdb')"/>
+      <FacadeAssembliesPDBCandidates Include="@(FacadeAssemblies->'$(_BclSourcePath)\Facades\%(Filename).pdb')"/>
+      <AssembliesPDBs Include="@(AssembliesPDBCandidates)" Condition="Exists('%(Identity)')"/>
+      <FacadeAssembliesPDBs Include="@(FacadeAssembliesPDBCandidates)" Condition="Exists('%(Identity)')"/>
     </ItemGroup> 
-    <Copy SourceFiles="@(Assemblies)" 
+    <Copy SourceFiles="@(Assemblies)"
           DestinationFiles="@(Assemblies->'$(_TargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
-    <Copy SourceFiles="@(PDBs)" 
-          DestinationFiles="@(PDBs->'$(_TargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
-    <Copy SourceFiles="@(FacadeAssemblies)" 
+    <Copy SourceFiles="@(AssembliesPDBs)"
+          DestinationFiles="@(AssembliesPDBs->'$(_TargetPath)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(FacadeAssemblies)"
           DestinationFiles="@(FacadeAssemblies->'$(_TargetPath)\Facades\%(RecursiveDir)%(Filename)%(Extension)')"/>
-    <Copy SourceFiles="$(FrameworkListFilePath)" 
+    <Copy SourceFiles="@(FacadeAssembliesPDBs)"
+          DestinationFiles="@(FacadeAssembliesPDBs->'$(_TargetPath)\Facades\%(RecursiveDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="$(FrameworkListFilePath)"
           DestinationFolder="$(_TargetPath)\RedistList"/>
   </Target>
 
