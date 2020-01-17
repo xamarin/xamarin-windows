@@ -60,6 +60,10 @@ namespace Xamarin.Windows.Tasks
 		public string PreAdditionalAotArguments { get; set; }
 		public string PostAdditionalAotArguments { get; set; }
 
+		public string OptimizationArguments { get; set; }
+
+		public int InlineLimit { get; set; } = -1;
+
 		[Output]
 		public ITaskItem[] GeneratedFiles { get; set; }
 
@@ -107,6 +111,8 @@ namespace Xamarin.Windows.Tasks
 			Log.LogDebugMessage("  IsDebug: {0}", IsDebug);
 			Log.LogDebugMessage("  Runtime: {0}", Runtime);
 			Log.LogDebugMessage("  EnableLLVM: {0}", EnableLLVM);
+			Log.LogDebugMessage("  OptimizationArguments: {0}", OptimizationArguments);
+			Log.LogDebugMessage("  InlineLimit: {0}", InlineLimit);
 			Log.LogDebugMessage("  OnlyRecompileIfChanged: {0}", OnlyRecompileIfChanged);
 			Log.LogDebugMessage("  GenerateNativeDebugInfo: {0}", GenerateNativeDebugInfo);
 			Log.LogDebugMessage("  OutputFileType: {0}", OutputFileType);
@@ -225,6 +231,10 @@ namespace Xamarin.Windows.Tasks
 					{
 						args.Add("--runtime=" + Runtime);
 					}
+					if (!string.IsNullOrWhiteSpace(OptimizationArguments))
+					{
+						args.Add("--optimize=" + OptimizationArguments);
+					}
 					args.Add("--aot=" + string.Join(",", aotOptions));
 					args.Add('"' + assemblyPath + '"');
 
@@ -328,6 +338,10 @@ namespace Xamarin.Windows.Tasks
 			psi.EnvironmentVariables["MONO_ENV_OPTIONS"] = String.Empty;
 			psi.EnvironmentVariables["MONO_PATH"] = assembliesPath;
 			psi.EnvironmentVariables["PATH"] = NativeToolchainPaths + ";" + crossCompilerPath;
+
+			if (InlineLimit > 0) {
+				psi.EnvironmentVariables["MONO_INLINELIMIT"] = InlineLimit.ToString();
+			}
 
 			Log.LogMessage(MessageImportance.High, "    {0}: PATH=\"{1}\" MONO_PATH=\"{2}\" MONO_ENV_OPTIONS=\"{3}\" {4} {5}",
 				compileTaskName,
