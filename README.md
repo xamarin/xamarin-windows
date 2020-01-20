@@ -122,7 +122,7 @@ mk-vs-experimental-links.bat
 ```
 
 It should now be possible to debug the extension in VS. **NOTE!** These links
-have to be recreated whenever the VS extension's verison number changes. The
+have to be recreated whenever the VS extension's version number changes. The
 version number is based on the number of commits so make sure to run the
 script after new files have been committed or pulled.
 
